@@ -24,7 +24,10 @@ app.use(helmet({
 
 // 2. CORS Restrictions
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Dynamically mirror requesting origin to prevent wildcard credential conflicts
+    callback(null, true);
+  },
   credentials: true,
 }));
 
