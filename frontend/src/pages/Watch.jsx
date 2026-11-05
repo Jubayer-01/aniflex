@@ -23,7 +23,7 @@ export default function Watch() {
   const [isSaved, setIsSaved] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [activeServer, setActiveServer] = useState('Sub (JP)');
-  const [streamServer, setStreamServer] = useState('server2'); // 'server2' (VidSrc Live) | 'server3' (2Embed Live) | 'server1' (Custom HLS)
+  const [streamServer, setStreamServer] = useState('server1'); // 'server1' (AnimeEmbed HD) | 'server2' (AnimeEmbed Node 2) | 'hls' (Custom HLS Player)
   const [likes, setLikes] = useState(6640);
   const [dislikes, setDislikes] = useState(127);
   const [userReaction, setUserReaction] = useState(null); // 'like' | 'dislike'
@@ -381,31 +381,31 @@ export default function Watch() {
               <div className="flex items-center gap-1 bg-[#111318] border border-white/10 rounded-full px-2 py-1 text-xs">
                 <span className="text-[#AAA2B7] text-[11px] px-2 font-medium">Server:</span>
                 <button
-                  onClick={() => setStreamServer('server2')}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'server2'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
-                    }`}
-                >
-                  Server 1 (AnimeEmbed HD)
-                </button>
-                <button
-                  onClick={() => setStreamServer('server3')}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'server3'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
-                    }`}
-                >
-                  Server 2 (2Embed Live)
-                </button>
-                <button
                   onClick={() => setStreamServer('server1')}
                   className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'server1'
                     ? 'bg-[#E2E8F0] text-black shadow-sm'
                     : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  Server 3 (HLS Custom Player)
+                  Server 1 (HD Stream)
+                </button>
+                <button
+                  onClick={() => setStreamServer('server2')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'server2'
+                    ? 'bg-[#E2E8F0] text-black shadow-sm'
+                    : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  Server 2 (Backup Node)
+                </button>
+                <button
+                  onClick={() => setStreamServer('hls')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'hls'
+                    ? 'bg-[#E2E8F0] text-black shadow-sm'
+                    : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  Server 3 (HLS Test)
                 </button>
               </div>
 
@@ -429,7 +429,7 @@ export default function Watch() {
           </div>
 
           {/* Video Player Display */}
-          {streamServer === 'server1' ? (
+          {streamServer === 'hls' ? (
             <VideoPlayer
               src="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
               poster={currentEpData.thumbnail || anime?.bannerImage || anime?.coverImage?.extraLarge}
@@ -442,32 +442,34 @@ export default function Watch() {
               onNextEpisode={() => nextEpData && handleSelectEpisode(nextEpData.number)}
               onPrevEpisode={() => prevEpData && handleSelectEpisode(prevEpData.number)}
             />
-          ) : streamServer === 'server2' ? (
-            <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-              <iframe
-                src={`https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}`}
-                className="w-full h-full border-0"
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                title={`${animeTitle} Episode ${currentEpData.number} - AnimeEmbed`}
-              />
-            </div>
           ) : (
             <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
               <iframe
-                src={`https://www.2embed.cc/embed/anime?id=${id || 101922}&ep=${currentEpData.number}`}
+                key={`${id}-${currentEpData.number}-${streamServer}-${activeServer}`}
+                src={`https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server2' ? '2' : '1'}&autoPlay=0&autoSkip=1&accent=8955EF`}
                 className="w-full h-full border-0"
                 allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                title={`${animeTitle} Episode ${currentEpData.number} - 2Embed`}
+                referrerPolicy="no-referrer"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                title={`${animeTitle} Episode ${currentEpData.number}`}
               />
             </div>
           )}
 
-          {/* Quick Stream Server Tip */}
-          <div className="flex items-center justify-between text-xs text-[#AAA2B7]/70 mt-3 px-2">
-            <span>Video not loading or blocked? Switch between <strong>Server 1</strong>, <strong>Server 2</strong>, or <strong>Server 3</strong> in the top bar.</span>
-            <span className="hidden sm:inline font-mono text-[11px] text-[#94A3B8]">Anime ID: {id || 101922} • Ep {currentEpData.number}</span>
+          {/* Stream Player Controls & Fallback */}
+          <div className="flex items-center justify-between text-xs text-[#AAA2B7]/70 mt-3 px-2 flex-wrap gap-2">
+            <span>Video not loading? Toggle between <strong>Server 1</strong> and <strong>Server 2</strong>, or switch <strong>Audio (Sub/Dub)</strong>.</span>
+            <div className="flex items-center gap-3">
+              <a
+                href={`https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&autoPlay=1`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all text-[11px] font-medium border border-white/10"
+              >
+                <span>Direct Player ↗</span>
+              </a>
+              <span className="hidden sm:inline font-mono text-[11px] text-[#94A3B8]">Anime ID: {id || 101922} • Ep {currentEpData.number}</span>
+            </div>
           </div>
         </div>
       </section>
