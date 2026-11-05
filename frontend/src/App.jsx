@@ -6,8 +6,12 @@ import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
 import AuthModal from './components/AuthModal';
 import ProtectedRoute from './components/ProtectedRoute';
+import UnderDevelopment from './components/UnderDevelopment';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home'; // Eagerly loaded for instant initial render
+
+// TOGGLE: Set to true for maintenance/development mode, false for live public site
+const IS_UNDER_MAINTENANCE = true;
 
 // Lazy-loaded route chunks to optimize initial bundle size & load speed
 const Watch = lazy(() => import('./pages/Watch'));
@@ -27,6 +31,15 @@ function PageLoader() {
 
 export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [bypassed, setBypassed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('preview') === 'true' || localStorage.getItem('aniflex_dev_bypass') === 'true';
+  });
+
+  if (IS_UNDER_MAINTENANCE && !bypassed) {
+    return <UnderDevelopment onUnlock={() => setBypassed(true)} />;
+  }
 
   return (
     <AuthProvider>
