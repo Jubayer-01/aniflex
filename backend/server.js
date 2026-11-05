@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { testConnection } from './config/db.js';
+import { testConnection, initDatabase } from './config/db.js';
 
 // Route imports
 import authRoutes from './routes/auth.js';
@@ -71,5 +71,8 @@ app.use((err, req, res, next) => {
 // Start Server
 app.listen(PORT, async () => {
   console.log(`ANIFLEX Backend running on http://localhost:${PORT}`);
-  await testConnection();
+  const connected = await testConnection();
+  if (connected) {
+    await initDatabase();
+  }
 });
