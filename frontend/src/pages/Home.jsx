@@ -10,6 +10,44 @@ import {
 import { getWatchHistory } from '../services/watchHistoryService';
 import { useNavigate } from 'react-router-dom';
 
+// Lightweight GPU-accelerated scroll fade-in wrapper
+function FadeInRow({ children, className = '' }) {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out transform ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const [heroAnime, setHeroAnime] = useState(FALLBACK_HERO);
@@ -107,75 +145,89 @@ export default function Home() {
         <ContinueWatchingRow items={continueWatching} />
 
         {/* Trending Now */}
-        <AnimeRow
-          title="Trending Now"
-          items={catalog.trending}
-          loading={loading && catalog.trending.length === 0}
-          seeAllLink="/explore?sort=TRENDING_DESC"
-          onSelectAnime={handlePlayAnime}
-          onPlayAnime={handlePlayAnime}
-        />
+        <FadeInRow>
+          <AnimeRow
+            title="Trending Now"
+            items={catalog.trending}
+            loading={loading && catalog.trending.length === 0}
+            seeAllLink="/explore?sort=TRENDING_DESC"
+            onSelectAnime={handlePlayAnime}
+            onPlayAnime={handlePlayAnime}
+          />
+        </FadeInRow>
 
         {/* Popular Anime */}
-        <AnimeRow
-          title="Popular Anime"
-          items={catalog.popular}
-          loading={loading && catalog.popular.length === 0}
-          seeAllLink="/explore?sort=POPULARITY_DESC"
-          onSelectAnime={handlePlayAnime}
-          onPlayAnime={handlePlayAnime}
-        />
+        <FadeInRow>
+          <AnimeRow
+            title="Popular Anime"
+            items={catalog.popular}
+            loading={loading && catalog.popular.length === 0}
+            seeAllLink="/explore?sort=POPULARITY_DESC"
+            onSelectAnime={handlePlayAnime}
+            onPlayAnime={handlePlayAnime}
+          />
+        </FadeInRow>
 
         {/* Action & Adventure */}
-        <AnimeRow
-          title="Action & Adventure"
-          items={catalog.action}
-          loading={loading && catalog.action.length === 0}
-          seeAllLink="/explore?genre=Action"
-          onSelectAnime={handlePlayAnime}
-          onPlayAnime={handlePlayAnime}
-        />
+        <FadeInRow>
+          <AnimeRow
+            title="Action & Adventure"
+            items={catalog.action}
+            loading={loading && catalog.action.length === 0}
+            seeAllLink="/explore?genre=Action"
+            onSelectAnime={handlePlayAnime}
+            onPlayAnime={handlePlayAnime}
+          />
+        </FadeInRow>
 
         {/* Romance */}
-        <AnimeRow
-          title="Romance"
-          items={catalog.romance}
-          loading={loading && catalog.romance.length === 0}
-          seeAllLink="/explore?genre=Romance"
-          onSelectAnime={handlePlayAnime}
-          onPlayAnime={handlePlayAnime}
-        />
+        <FadeInRow>
+          <AnimeRow
+            title="Romance"
+            items={catalog.romance}
+            loading={loading && catalog.romance.length === 0}
+            seeAllLink="/explore?genre=Romance"
+            onSelectAnime={handlePlayAnime}
+            onPlayAnime={handlePlayAnime}
+          />
+        </FadeInRow>
 
         {/* Anime Movies */}
-        <AnimeRow
-          title="Anime Movies"
-          items={catalog.movies}
-          loading={loading && catalog.movies.length === 0}
-          seeAllLink="/explore?format=MOVIE"
-          onSelectAnime={handlePlayAnime}
-          onPlayAnime={handlePlayAnime}
-        />
+        <FadeInRow>
+          <AnimeRow
+            title="Anime Movies"
+            items={catalog.movies}
+            loading={loading && catalog.movies.length === 0}
+            seeAllLink="/explore?format=MOVIE"
+            onSelectAnime={handlePlayAnime}
+            onPlayAnime={handlePlayAnime}
+          />
+        </FadeInRow>
 
         {/* Recently Added */}
-        <AnimeRow
-          title="Recently Added"
-          items={catalog.recent}
-          loading={loading && catalog.recent.length === 0}
-          seeAllLink="/explore?sort=START_DATE_DESC"
-          onSelectAnime={handlePlayAnime}
-          onPlayAnime={handlePlayAnime}
-        />
+        <FadeInRow>
+          <AnimeRow
+            title="Recently Added"
+            items={catalog.recent}
+            loading={loading && catalog.recent.length === 0}
+            seeAllLink="/explore?sort=START_DATE_DESC"
+            onSelectAnime={handlePlayAnime}
+            onPlayAnime={handlePlayAnime}
+          />
+        </FadeInRow>
 
         {/* View More Button */}
-        <div className="flex justify-center pt-8 pb-4">
-          <button
-            onClick={() => navigate('/explore')}
-            className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#15171E] hover:bg-[#E2E8F0] hover:text-black border border-white/10 hover:border-white text-white font-bold text-sm tracking-wide transition-all shadow-lg hover:scale-105 active:scale-95"
-          >
-            <span>View More</span>
-            <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-black group-hover:translate-x-1 transition-all" />
-          </button>
-        </div>
+        <FadeInRow>
+          <div className="flex justify-center pt-8 pb-4">
+            <button
+              onClick={() => navigate('/explore')}
+              className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#15171E] hover:bg-[#E2E8F0] hover:text-black border border-white/10 hover:border-white text-white font-bold text-sm tracking-wide transition-all shadow-lg hover:scale-105 active:scale-95"
+            >
+              <span>View More</span>
+              <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-black group-hover:translate-x-1 transition-all" />
+            </button>
+          </div>
+        </FadeInRow>
       </div>
     </div>
   );
