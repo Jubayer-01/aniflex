@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import VideoPlayer from '../components/VideoPlayer';
 import AnimeRow from '../components/AnimeRow';
 import { getAnimeDetails, FALLBACK_HERO } from '../services/anilistService';
+import { getMovieDetails, getTVDetails, getTVSeason, getTMDBImageUrl } from '../services/tmdbService';
 import { saveWatchProgress, getLastWatchedEpisode } from '../services/watchHistoryService';
 import {
   ThumbsUp, ThumbsDown, Bookmark, Check, Share2, ArrowLeft,
@@ -10,7 +11,8 @@ import {
 } from 'lucide-react';
 
 export default function Watch() {
-  const { id } = useParams();
+  const { type: urlType, id } = useParams();
+  const mediaType = urlType || 'anime'; // 'movie' | 'tv' | 'anime'
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -23,10 +25,10 @@ export default function Watch() {
   const [isSaved, setIsSaved] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [activeServer, setActiveServer] = useState('Sub (JP)');
-  const [streamServer, setStreamServer] = useState('server1'); // 'server1' (AnimeEmbed HD) | 'server2' (AnimeEmbed Node 2) | 'hls' (Custom HLS Player)
+  const [streamServer, setStreamServer] = useState('server1'); // 'server1' (HD Stream) | 'server2' (Backup Node) | 'hls' (Custom HLS)
   const [likes, setLikes] = useState(6640);
   const [dislikes, setDislikes] = useState(127);
-  const [userReaction, setUserReaction] = useState(null); // 'like' | 'dislike'
+  const [userReaction, setUserReaction] = useState(null);
 
   const CHUNK_SIZE = 25;
 
@@ -35,43 +37,102 @@ export default function Watch() {
     setLoading(true);
     setSelectedSeasonIdx(0);
 
-    // Resume from URL ?ep=... or from saved watch history!
-    const queryEp = searchParams.get('ep');
+    const queryEp = searchParams.get('ep') || searchParams.get('e');
     const savedEp = queryEp ? Number(queryEp) : getLastWatchedEpisode(id);
     const initialEp = savedEp && savedEp > 0 ? savedEp : 1;
 
     setCurrentEpisodeNum(initialEp);
     setSelectedChunkIdx(Math.floor((initialEp - 1) / CHUNK_SIZE));
 
-    getAnimeDetails(id || 101922).then((data) => {
-      if (!isMounted) return;
-      const loadedAnime = data || FALLBACK_HERO;
-      setAnime(loadedAnime);
-      setLoading(false);
-
-      // Save to Continue Watching history
-      const title = loadedAnime.title?.english || loadedAnime.title?.romaji || 'Anime';
-      const banner = loadedAnime.bannerImage || loadedAnime.coverImage?.extraLarge;
-      const cover = loadedAnime.coverImage?.large || loadedAnime.coverImage?.extraLarge;
-      const total = loadedAnime.episodes || 12;
-
-      saveWatchProgress({
-        id: id || 101922,
-        title,
-        episodeNumber: initialEp,
-        totalEpisodes: total,
-        banner,
-        cover,
-        progressPercent: Math.round((initialEp / total) * 100),
+    if (mediaType === 'movie') {
+      getMovieDetails(id).then((movieData) => {
+        if (!isMounted) return;
+        if (movieData) {
+          const formatted = {
+            id: movieData.id,
+            title: { english: movieData.title, romaji: movieData.original_title },
+            bannerImage: getTMDBImageUrl(movieData.backdrop_path, 'original'),
+            coverImage: { extraLarge: getTMDBImageUrl(movieData.poster_path, 'w500') },
+            averageScore: Math.round((movieData.vote_average || 8) * 10),
+            description: movieData.overview,
+            genres: movieData.genres?.map((g) => g.name) || ['Cinema'],
+            episodes: 1,
+            media_type: 'movie',
+            release_date: movieData.release_date,
+          };
+          setAnime(formatted);
+          saveWatchProgress({
+            id,
+            title: movieData.title,
+            episodeNumber: 1,
+            totalEpisodes: 1,
+            banner: formatted.bannerImage,
+            cover: formatted.coverImage.extraLarge,
+            progressPercent: 100,
+          });
+        }
+        setLoading(false);
       });
-    });
+    } else if (mediaType === 'tv') {
+      getTVDetails(id).then((tvData) => {
+        if (!isMounted) return;
+        if (tvData) {
+          const totalEps = tvData.number_of_episodes || 12;
+          const formatted = {
+            id: tvData.id,
+            title: { english: tvData.name, romaji: tvData.original_name },
+            bannerImage: getTMDBImageUrl(tvData.backdrop_path, 'original'),
+            coverImage: { extraLarge: getTMDBImageUrl(tvData.poster_path, 'w500') },
+            averageScore: Math.round((tvData.vote_average || 8) * 10),
+            description: tvData.overview,
+            genres: tvData.genres?.map((g) => g.name) || ['TV Series'],
+            episodes: totalEps,
+            seasons: tvData.number_of_seasons || 1,
+            media_type: 'tv',
+          };
+          setAnime(formatted);
+          saveWatchProgress({
+            id,
+            title: tvData.name,
+            episodeNumber: initialEp,
+            totalEpisodes: totalEps,
+            banner: formatted.bannerImage,
+            cover: formatted.coverImage.extraLarge,
+            progressPercent: Math.round((initialEp / totalEps) * 100),
+          });
+        }
+        setLoading(false);
+      });
+    } else {
+      getAnimeDetails(id || 101922).then((data) => {
+        if (!isMounted) return;
+        const loadedAnime = data || FALLBACK_HERO;
+        setAnime(loadedAnime);
+        setLoading(false);
+
+        const title = loadedAnime.title?.english || loadedAnime.title?.romaji || 'Anime';
+        const banner = loadedAnime.bannerImage || loadedAnime.coverImage?.extraLarge;
+        const cover = loadedAnime.coverImage?.large || loadedAnime.coverImage?.extraLarge;
+        const total = loadedAnime.episodes || 12;
+
+        saveWatchProgress({
+          id: id || 101922,
+          title,
+          episodeNumber: initialEp,
+          totalEpisodes: total,
+          banner,
+          cover,
+          progressPercent: Math.round((initialEp / total) * 100),
+        });
+      });
+    }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, mediaType]);
 
   const animeTitle = anime?.title?.english || anime?.title?.romaji || 'Demon Slayer: Kimetsu no Yaiba';
   const score = anime?.averageScore ? (anime.averageScore / 10).toFixed(1) : '9.2';
@@ -442,10 +503,42 @@ export default function Watch() {
               onNextEpisode={() => nextEpData && handleSelectEpisode(nextEpData.number)}
               onPrevEpisode={() => prevEpData && handleSelectEpisode(prevEpData.number)}
             />
+          ) : mediaType === 'movie' ? (
+            <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+              <iframe
+                key={`movie-${id}-${streamServer}`}
+                src={
+                  streamServer === 'server2'
+                    ? `https://vidsrc.to/embed/movie/${id}`
+                    : `https://vidlink.pro/movie/${id}`
+                }
+                className="w-full h-full border-0"
+                allowFullScreen
+                referrerPolicy="no-referrer"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                title={`${animeTitle} - Full Movie`}
+              />
+            </div>
+          ) : mediaType === 'tv' ? (
+            <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+              <iframe
+                key={`tv-${id}-${currentEpisodeNum}-${streamServer}`}
+                src={
+                  streamServer === 'server2'
+                    ? `https://vidsrc.to/embed/tv/${id}/1/${currentEpisodeNum}`
+                    : `https://vidlink.pro/tv/${id}/1/${currentEpisodeNum}`
+                }
+                className="w-full h-full border-0"
+                allowFullScreen
+                referrerPolicy="no-referrer"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                title={`${animeTitle} Season 1 Episode ${currentEpisodeNum}`}
+              />
+            </div>
           ) : (
             <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
               <iframe
-                key={`${id}-${currentEpData.number}-${streamServer}-${activeServer}`}
+                key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}`}
                 src={`https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server2' ? '2' : '1'}&autoPlay=0&autoSkip=1&accent=8955EF`}
                 className="w-full h-full border-0"
                 allowFullScreen
@@ -458,17 +551,31 @@ export default function Watch() {
 
           {/* Stream Player Controls & Fallback */}
           <div className="flex items-center justify-between text-xs text-[#AAA2B7]/70 mt-3 px-2 flex-wrap gap-2">
-            <span>Video not loading? Toggle between <strong>Server 1</strong> and <strong>Server 2</strong>, or switch <strong>Audio (Sub/Dub)</strong>.</span>
+            <span>
+              {mediaType === 'movie'
+                ? 'Streaming in 4K/1080p. Switch between Server 1 and Server 2 if any node buffers.'
+                : mediaType === 'tv'
+                ? 'Streaming TV Series. Toggle between Server 1 and Server 2 if needed.'
+                : 'Video not loading? Toggle between Server 1 and Server 2, or switch Audio (Sub/Dub).'}
+            </span>
             <div className="flex items-center gap-3">
               <a
-                href={`https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&autoPlay=1`}
+                href={
+                  mediaType === 'movie'
+                    ? `https://vidlink.pro/movie/${id}`
+                    : mediaType === 'tv'
+                    ? `https://vidlink.pro/tv/${id}/1/${currentEpisodeNum}`
+                    : `https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&autoPlay=1`
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all text-[11px] font-medium border border-white/10"
               >
                 <span>Direct Player ↗</span>
               </a>
-              <span className="hidden sm:inline font-mono text-[11px] text-[#94A3B8]">Anime ID: {id || 101922} • Ep {currentEpData.number}</span>
+              <span className="hidden sm:inline font-mono text-[11px] text-[#94A3B8]">
+                {mediaType.toUpperCase()} ID: {id || 101922} {mediaType !== 'movie' ? `• Ep ${currentEpisodeNum}` : ''}
+              </span>
             </div>
           </div>
         </div>

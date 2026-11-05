@@ -4,12 +4,42 @@ import { Play, Star, Plus } from 'lucide-react';
 export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
   if (!anime) return null;
 
-  const title = anime.title?.english || anime.title?.romaji || anime.title?.native || 'Anime Title';
-  const cover = anime.coverImage?.extraLarge || anime.coverImage?.large || anime.coverImage?.medium;
-  const score = anime.averageScore ? (anime.averageScore / 10).toFixed(1) : (anime.score || null);
-  const year = anime.seasonYear || anime.year;
-  const genre = anime.genres?.[0];
-  const formatBadge = genre || (anime.format ? (anime.format === 'TV_SHORT' ? 'TV' : anime.format) : 'TV');
+  // Universal Media Adapter (Supports AniList and TMDB structures)
+  const title =
+    typeof anime.title === 'string'
+      ? anime.title
+      : anime.title?.english || anime.title?.romaji || anime.title?.native || anime.name || 'Untitled';
+
+  const cover =
+    anime.coverImage?.extraLarge ||
+    anime.coverImage?.large ||
+    anime.coverImage?.medium ||
+    (anime.poster_path ? `https://image.tmdb.org/t/p/w500${anime.poster_path}` : null) ||
+    anime.poster_url ||
+    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=60';
+
+  const score = anime.averageScore
+    ? (anime.averageScore / 10).toFixed(1)
+    : anime.vote_average
+    ? anime.vote_average.toFixed(1)
+    : anime.score || null;
+
+  const year =
+    anime.seasonYear ||
+    anime.year ||
+    (anime.release_date ? anime.release_date.slice(0, 4) : null) ||
+    (anime.first_air_date ? anime.first_air_date.slice(0, 4) : null);
+
+  const formatBadge =
+    anime.media_type === 'movie'
+      ? 'Movie'
+      : anime.media_type === 'tv'
+      ? 'Series'
+      : anime.format
+      ? anime.format === 'TV_SHORT'
+        ? 'TV'
+        : anime.format
+      : anime.genres?.[0] || 'HD';
 
   return (
     <div

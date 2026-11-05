@@ -33,8 +33,9 @@ export default function Navbar({ onOpenSearch }) {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Movies', path: '/explore?format=movie' },
-    { name: 'Series', path: '/explore?format=tv' },
+    { name: 'Movies', path: '/movies' },
+    { name: 'Series', path: '/series' },
+    { name: 'Anime', path: '/anime' },
     { name: 'Explore', path: '/explore' },
   ];
 

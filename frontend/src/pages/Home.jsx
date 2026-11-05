@@ -1,14 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowRight, Film, Tv, Play, Sparkles, Clapperboard, Star } from 'lucide-react';
 import Hero from '../components/Hero';
 import ContinueWatchingRow from '../components/ContinueWatchingRow';
 import AnimeRow from '../components/AnimeRow';
+import { getHomePageCatalog, FALLBACK_HERO } from '../services/anilistService';
 import {
-  getHomePageCatalog,
-  FALLBACK_HERO
-} from '../services/anilistService';
+  getTrendingAll,
+  getHollywoodMovies,
+  getBollywoodMovies,
+  getPopularSeries,
+  getTMDBImageUrl,
+} from '../services/tmdbService';
 import { getWatchHistory } from '../services/watchHistoryService';
-import { useNavigate } from 'react-router-dom';
 
 // Lightweight GPU-accelerated scroll fade-in wrapper
 function FadeInRow({ children, className = '' }) {
@@ -50,68 +54,89 @@ function FadeInRow({ children, className = '' }) {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [heroAnime, setHeroAnime] = useState(FALLBACK_HERO);
   const [continueWatching, setContinueWatching] = useState(() => getWatchHistory());
-  const [catalog, setCatalog] = useState({
-    trending: [],
-    popular: [],
-    action: [],
-    romance: [],
-    movies: [],
-    recent: [],
-  });
+  const [heroItems, setHeroItems] = useState([FALLBACK_HERO]);
+  const [trendingAll, setTrendingAll] = useState([]);
+  const [hollywoodMovies, setHollywoodMovies] = useState([]);
+  const [bollywoodMovies, setBollywoodMovies] = useState([]);
+  const [tvSeries, setTvSeries] = useState([]);
+  const [animeList, setAnimeList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const lastFetchedRef = useRef(Date.now());
 
   useEffect(() => {
     let isMounted = true;
 
-    async function loadCatalog(force = false) {
+    async function loadOmniData() {
       try {
-        if (!force) setLoading(true);
-        const data = await getHomePageCatalog(force);
+        setLoading(true);
+        const [omniTrending, hollywood, bollywood, tv, animeCatalog] = await Promise.all([
+          getTrendingAll(),
+          getHollywoodMovies(1),
+          getBollywoodMovies(1),
+          getPopularSeries(1),
+          getHomePageCatalog(false),
+        ]);
+
         if (!isMounted) return;
 
-        if (data) {
-          setCatalog(data);
-          if (data.trending && data.trending.length > 0) {
-            setHeroAnime(data.trending[0]);
-          }
-          lastFetchedRef.current = Date.now();
+        setTrendingAll(omniTrending || []);
+        setHollywoodMovies(hollywood || []);
+        setBollywoodMovies(bollywood || []);
+        setTvSeries(tv || []);
+
+        const topAnime = animeCatalog?.trending || [];
+        setAnimeList(topAnime);
+
+        // Build a blended Hero banner (Movie + TV + Anime)
+        const blendedHeroes = [];
+        if (omniTrending?.[0]) {
+          const m = omniTrending[0];
+          blendedHeroes.push({
+            id: m.id,
+            title: { english: m.title || m.name, romaji: m.title || m.name },
+            bannerImage: getTMDBImageUrl(m.backdrop_path, 'original'),
+            coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w500') },
+            score: m.vote_average ? m.vote_average.toFixed(1) : '8.5',
+            year: m.release_date?.slice(0, 4) || m.first_air_date?.slice(0, 4) || '2026',
+            description: m.overview,
+            genres: [m.media_type === 'tv' ? 'TV Series' : 'Blockbuster Movie'],
+            media_type: m.media_type || 'movie',
+          });
         }
+
+        if (topAnime?.[0]) {
+          blendedHeroes.push(topAnime[0]);
+        }
+
+        if (bollywood?.[0]) {
+          const b = bollywood[0];
+          blendedHeroes.push({
+            id: b.id,
+            title: { english: b.title || b.original_title, romaji: b.title || b.original_title },
+            bannerImage: getTMDBImageUrl(b.backdrop_path, 'original'),
+            coverImage: { extraLarge: getTMDBImageUrl(b.poster_path, 'w500') },
+            score: b.vote_average ? b.vote_average.toFixed(1) : '8.2',
+            year: b.release_date?.slice(0, 4) || '2026',
+            description: b.overview,
+            genres: ['Bollywood Cinema'],
+            media_type: 'movie',
+          });
+        }
+
+        setHeroItems(blendedHeroes.length > 0 ? blendedHeroes : [FALLBACK_HERO]);
       } catch (err) {
-        console.error('Failed to load anime catalog:', err);
+        console.error('Omni home load error:', err);
       } finally {
         if (isMounted) setLoading(false);
       }
     }
 
-    loadCatalog();
+    loadOmniData();
 
-    // 1. Auto-refresh trending anime every 10 minutes from AniList
-    const refreshTimer = setInterval(() => {
-      loadCatalog(true);
-    }, 10 * 60 * 1000);
-
-    // 2. Auto-refresh when user returns to tab if >10 min passed
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        const elapsed = Date.now() - lastFetchedRef.current;
-        if (elapsed > 10 * 60 * 1000) {
-          loadCatalog(true);
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // 3. Reactively update Continue Watching when any episode is watched
+    // Watch history listener
     const handleHistoryUpdate = (e) => {
-      if (e.detail) {
-        setContinueWatching(e.detail);
-      } else {
-        setContinueWatching(getWatchHistory());
-      }
+      if (e.detail) setContinueWatching(e.detail);
+      else setContinueWatching(getWatchHistory());
     };
 
     window.addEventListener('aniflex:watchHistoryUpdate', handleHistoryUpdate);
@@ -119,113 +144,131 @@ export default function Home() {
 
     return () => {
       isMounted = false;
-      clearInterval(refreshTimer);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('aniflex:watchHistoryUpdate', handleHistoryUpdate);
       window.removeEventListener('storage', handleHistoryUpdate);
     };
   }, []);
 
-  const handlePlayAnime = (anime) => {
-    navigate(`/watch/${anime.id}`);
+  const handlePlayMedia = (item) => {
+    if (item.media_type === 'tv') {
+      navigate(`/watch/tv/${item.id}?s=1&e=1`);
+    } else if (item.media_type === 'movie' || item.release_date) {
+      navigate(`/watch/movie/${item.id}`);
+    } else {
+      navigate(`/watch/anime/${item.id}`);
+    }
   };
 
   return (
-    <div className="relative min-h-screen bg-[#060709] text-white overflow-x-hidden">
-      {/* Hero Spotlight Section: Top 6 Side-by-Side Trending Anime with 7s Loop */}
+    <div className="relative min-h-screen bg-[#060709] text-white overflow-x-hidden font-sans">
+      {/* 1. Master Omni Hero Spotlight */}
       <Hero
-        anime={heroAnime}
-        items={catalog.trending && catalog.trending.length > 0 ? catalog.trending.slice(0, 6) : [heroAnime]}
-        onOpenDetails={(anime) => handlePlayAnime(anime)}
+        anime={heroItems[0]}
+        items={heroItems}
+        onOpenDetails={handlePlayMedia}
       />
 
-      {/* Main Content Shelves */}
-      <div className="relative z-20 -mt-16 space-y-3 pb-12">
+      {/* 2. Main Entertainment Shelves */}
+      <div className="relative z-20 -mt-16 space-y-3 pb-16">
         {/* Continue Watching Shelf */}
         <ContinueWatchingRow items={continueWatching} />
 
-        {/* Trending Now */}
+        {/* Global Trending Now */}
         <FadeInRow>
           <AnimeRow
             title="Trending Now"
-            items={catalog.trending}
-            loading={loading && catalog.trending.length === 0}
-            seeAllLink="/explore?sort=TRENDING_DESC"
-            onSelectAnime={handlePlayAnime}
-            onPlayAnime={handlePlayAnime}
+            items={trendingAll.map((item) => ({
+              ...item,
+              media_type: item.media_type || 'movie',
+            }))}
+            loading={loading && trendingAll.length === 0}
+            seeAllLink="/movies"
+            onSelectAnime={handlePlayMedia}
+            onPlayAnime={handlePlayMedia}
           />
         </FadeInRow>
 
-        {/* Popular Anime */}
+        {/* Hollywood Blockbusters */}
         <FadeInRow>
           <AnimeRow
-            title="Popular Anime"
-            items={catalog.popular}
-            loading={loading && catalog.popular.length === 0}
-            seeAllLink="/explore?sort=POPULARITY_DESC"
-            onSelectAnime={handlePlayAnime}
-            onPlayAnime={handlePlayAnime}
+            title="Hollywood Blockbusters"
+            items={hollywoodMovies.map((m) => ({ ...m, media_type: 'movie' }))}
+            loading={loading && hollywoodMovies.length === 0}
+            seeAllLink="/movies"
+            onSelectAnime={handlePlayMedia}
+            onPlayAnime={handlePlayMedia}
           />
         </FadeInRow>
 
-        {/* Action & Adventure */}
+        {/* Bollywood Cinema */}
         <FadeInRow>
           <AnimeRow
-            title="Action & Adventure"
-            items={catalog.action}
-            loading={loading && catalog.action.length === 0}
-            seeAllLink="/explore?genre=Action"
-            onSelectAnime={handlePlayAnime}
-            onPlayAnime={handlePlayAnime}
+            title="Bollywood Cinema (Hindi Hits)"
+            items={bollywoodMovies.map((m) => ({ ...m, media_type: 'movie' }))}
+            loading={loading && bollywoodMovies.length === 0}
+            seeAllLink="/movies"
+            onSelectAnime={handlePlayMedia}
+            onPlayAnime={handlePlayMedia}
           />
         </FadeInRow>
 
-        {/* Romance */}
+        {/* Trending TV & Web Series */}
         <FadeInRow>
           <AnimeRow
-            title="Romance"
-            items={catalog.romance}
-            loading={loading && catalog.romance.length === 0}
-            seeAllLink="/explore?genre=Romance"
-            onSelectAnime={handlePlayAnime}
-            onPlayAnime={handlePlayAnime}
+            title="Popular TV & Web Series"
+            items={tvSeries.map((s) => ({ ...s, media_type: 'tv' }))}
+            loading={loading && tvSeries.length === 0}
+            seeAllLink="/series"
+            onSelectAnime={handlePlayMedia}
+            onPlayAnime={handlePlayMedia}
           />
         </FadeInRow>
 
-        {/* Anime Movies */}
+        {/* Anime Spotlight */}
         <FadeInRow>
           <AnimeRow
-            title="Anime Movies"
-            items={catalog.movies}
-            loading={loading && catalog.movies.length === 0}
-            seeAllLink="/explore?format=MOVIE"
-            onSelectAnime={handlePlayAnime}
-            onPlayAnime={handlePlayAnime}
+            title="Anime Spotlight"
+            items={animeList}
+            loading={loading && animeList.length === 0}
+            seeAllLink="/anime"
+            onSelectAnime={handlePlayMedia}
+            onPlayAnime={handlePlayMedia}
           />
         </FadeInRow>
 
-        {/* Recently Added */}
+        {/* Explore All Hubs Banner */}
         <FadeInRow>
-          <AnimeRow
-            title="Recently Added"
-            items={catalog.recent}
-            loading={loading && catalog.recent.length === 0}
-            seeAllLink="/explore?sort=START_DATE_DESC"
-            onSelectAnime={handlePlayAnime}
-            onPlayAnime={handlePlayAnime}
-          />
-        </FadeInRow>
+          <div className="w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-8">
+            <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-[#141622] via-[#10121C] to-[#0A0B11] border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+              <div className="space-y-2 text-center md:text-left">
+                <span className="text-xs font-bold text-[#8955EF] tracking-wider uppercase">Unlimited Entertainment</span>
+                <h3 className="text-2xl sm:text-3xl font-black text-white">One App for All Your Streaming</h3>
+                <p className="text-xs sm:text-sm text-[#AAA2B7] max-w-xl">
+                  Switch instantly between Hollywood cinema, Bollywood blockbusters, trending TV dramas, and full anime seasons.
+                </p>
+              </div>
 
-        {/* View More Button */}
-        <FadeInRow>
-          <div className="flex justify-center pt-8 pb-4">
-            <button
-              onClick={() => navigate('/explore')}
-              className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#15171E] hover:bg-[#E2E8F0] hover:text-black border border-white/10 hover:border-white text-white font-bold text-sm tracking-wide transition-all shadow-lg hover:scale-105 active:scale-95"
-            >
-              <span>View More</span>
-              <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-black group-hover:translate-x-1 transition-all" />
-            </button>
+              <div className="flex items-center gap-3 flex-wrap justify-center">
+                <Link
+                  to="/movies"
+                  className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white text-white hover:text-black font-bold text-xs transition-all border border-white/10"
+                >
+                  Browse Movies
+                </Link>
+                <Link
+                  to="/series"
+                  className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white text-white hover:text-black font-bold text-xs transition-all border border-white/10"
+                >
+                  Browse Series
+                </Link>
+                <Link
+                  to="/anime"
+                  className="px-5 py-2.5 rounded-full bg-[#8955EF] hover:bg-[#7843DE] text-white font-bold text-xs transition-all shadow-lg shadow-[#8955EF]/30"
+                >
+                  Open Anime Hub
+                </Link>
+              </div>
+            </div>
           </div>
         </FadeInRow>
       </div>

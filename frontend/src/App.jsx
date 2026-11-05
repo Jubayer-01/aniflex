@@ -14,6 +14,9 @@ import Home from './pages/Home'; // Eagerly loaded for instant initial render
 const IS_UNDER_MAINTENANCE = true;
 
 // Lazy-loaded route chunks to optimize initial bundle size & load speed
+const Movies = lazy(() => import('./pages/Movies'));
+const Series = lazy(() => import('./pages/Series'));
+const Anime = lazy(() => import('./pages/Anime'));
 const Watch = lazy(() => import('./pages/Watch'));
 const Explore = lazy(() => import('./pages/Explore'));
 const Search = lazy(() => import('./pages/Search'));
@@ -62,7 +65,11 @@ export default function App() {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/movies" element={<Movies />} />
+                <Route path="/series" element={<Series />} />
+                <Route path="/anime" element={<Anime />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/watch/:type/:id" element={<Watch />} />
                 <Route path="/watch/:id" element={<Watch />} />
                 <Route path="/explore" element={<Explore />} />
                 <Route path="/mylist" element={<MyList />} />
