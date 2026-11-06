@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 export default function ProtectedRoute({ children }) {
   const { isAuthenticated, loading, openAuthModal } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      openAuthModal('login');
+    }
+  }, [loading, isAuthenticated, openAuthModal]);
 
   if (loading) {
     return (
@@ -15,8 +21,6 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!isAuthenticated) {
-    // Open auth modal so the user can easily log in
-    openAuthModal('login');
     return <Navigate to="/" replace />;
   }
 

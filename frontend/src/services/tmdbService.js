@@ -60,7 +60,7 @@ async function fetchProxy(endpoint, params = {}) {
 // 1. Trending All (Movies + TV) for Omni Home
 export async function getTrendingAll() {
   const data = await fetchProxy('/trending');
-  return data?.results || FALLBACK_MOVIES;
+  return data?.results || [];
 }
 
 // 2. Hollywood Blockbuster Movies

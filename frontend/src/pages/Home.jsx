@@ -103,19 +103,7 @@ export default function Home() {
           media_type: m.media_type || (m.first_air_date ? 'tv' : 'movie'),
         }));
 
-        const fallbackMovieHero = {
-          id: 969681,
-          title: { english: 'The Odyssey', romaji: 'The Odyssey' },
-          bannerImage: 'https://image.tmdb.org/t/p/original/zOpe0eHbgF3pr5NGaswhR48b6p0.jpg',
-          coverImage: { extraLarge: 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg' },
-          score: '8.5',
-          year: '2025',
-          description: 'After a decade of battle, a Greek king embarks on a perilous voyage home.',
-          genres: ['Blockbuster Movie'],
-          media_type: 'movie',
-        };
-
-        setHeroItems(movieTvHeroes.length > 0 ? movieTvHeroes : [fallbackMovieHero]);
+        setHeroItems(movieTvHeroes);
       } catch (err) {
         console.error('Omni home load error:', err);
       } finally {
@@ -161,7 +149,7 @@ export default function Home() {
       />
 
       {/* 2. Main Entertainment Shelves */}
-      <div className="relative z-20 -mt-16 space-y-3 pb-16">
+      <div className="relative z-20 pt-6 space-y-3 pb-16">
         {/* Continue Watching Shelf */}
         <ContinueWatchingRow items={continueWatching} />
 

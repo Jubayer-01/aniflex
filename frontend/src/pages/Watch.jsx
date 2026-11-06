@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import AnimeRow from '../components/AnimeRow';
-import { getAnimeDetails, FALLBACK_HERO } from '../services/anilistService';
+import NotFound from './NotFound';
+import { getAnimeDetails } from '../services/anilistService';
 import { getMovieDetails, getTVDetails, getTVSeason, getTMDBImageUrl } from '../services/tmdbService';
 import { saveWatchProgress, getLastWatchedEpisode } from '../services/watchHistoryService';
 import {
@@ -14,6 +15,10 @@ export default function Watch() {
   const mediaType = urlType || 'anime'; // 'movie' | 'tv' | 'anime'
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Validate ID: All valid TMDB and AniList IDs are strictly numeric
+  const isValidNumericId = Boolean(id && /^\d+$/.test(String(id)));
+  const [hasError, setHasError] = useState(false);
 
   // Anime & playback state
   const [anime, setAnime] = useState(null);
@@ -40,7 +45,14 @@ export default function Watch() {
 
   useEffect(() => {
     let isMounted = true;
+    if (!isValidNumericId) {
+      setHasError(true);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
+    setHasError(false);
     setSelectedSeasonIdx(0);
 
     const queryEp = searchParams.get('ep') || searchParams.get('e');
@@ -99,6 +111,8 @@ export default function Watch() {
             cover: formatted.coverImage.extraLarge,
             progressPercent: 100,
           });
+        } else {
+          setHasError(true);
         }
         setLoading(false);
       });
@@ -157,30 +171,34 @@ export default function Watch() {
             cover: formatted.coverImage.extraLarge,
             progressPercent: Math.round((initialEp / totalEps) * 100),
           });
+        } else {
+          setHasError(true);
         }
         setLoading(false);
       });
     } else {
-      getAnimeDetails(id || 101922).then((data) => {
+      getAnimeDetails(id).then((data) => {
         if (!isMounted) return;
-        const loadedAnime = data || FALLBACK_HERO;
-        setAnime(loadedAnime);
+        if (data) {
+          setAnime(data);
+          const title = data.title?.english || data.title?.romaji || 'Anime';
+          const banner = data.bannerImage || data.coverImage?.extraLarge;
+          const cover = data.coverImage?.large || data.coverImage?.extraLarge;
+          const total = data.episodes || 12;
+
+          saveWatchProgress({
+            id,
+            title,
+            episodeNumber: initialEp,
+            totalEpisodes: total,
+            banner,
+            cover,
+            progressPercent: Math.round((initialEp / total) * 100),
+          });
+        } else {
+          setHasError(true);
+        }
         setLoading(false);
-
-        const title = loadedAnime.title?.english || loadedAnime.title?.romaji || 'Anime';
-        const banner = loadedAnime.bannerImage || loadedAnime.coverImage?.extraLarge;
-        const cover = loadedAnime.coverImage?.large || loadedAnime.coverImage?.extraLarge;
-        const total = loadedAnime.episodes || 12;
-
-        saveWatchProgress({
-          id: id || 101922,
-          title,
-          episodeNumber: initialEp,
-          totalEpisodes: total,
-          banner,
-          cover,
-          progressPercent: Math.round((initialEp / total) * 100),
-        });
       });
     }
 
@@ -515,6 +533,26 @@ export default function Watch() {
       setDislikes((prev) => prev + 1);
     }
   };
+
+  useEffect(() => {
+    if (anime) {
+      const activeTitle = anime.title?.english || anime.title?.romaji || 'Watch';
+      document.title = `${activeTitle} — Watch on OmniFlex`;
+    }
+  }, [anime]);
+
+  if (!isValidNumericId || hasError) {
+    return <NotFound />;
+  }
+
+  if (loading && !anime) {
+    return (
+      <div className="min-h-[70vh] bg-[#060709] flex flex-col items-center justify-center gap-3">
+        <div className="w-10 h-10 border-2 border-[#E2E8F0] border-t-transparent rounded-full animate-spin" />
+        <span className="text-xs text-[#AAA2B7] font-medium tracking-wide animate-pulse">Loading Title...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#060709] text-white pt-20 pb-20 selection:bg-white/20 selection:text-white">

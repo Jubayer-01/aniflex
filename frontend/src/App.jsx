@@ -1,5 +1,5 @@
-import React, { useState, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -35,6 +35,37 @@ function PageLoader() {
   );
 }
 
+function RouteTitleManager() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/') {
+      document.title = 'OmniFlex — Universal Movies, Series & Anime';
+    } else if (path === '/movies') {
+      document.title = 'Movies — OmniFlex';
+    } else if (path === '/series') {
+      document.title = 'TV Series — OmniFlex';
+    } else if (path === '/anime') {
+      document.title = 'Anime Hub — OmniFlex';
+    } else if (path === '/explore') {
+      document.title = 'Explore Catalog — OmniFlex';
+    } else if (path === '/search') {
+      document.title = 'Search — OmniFlex';
+    } else if (path === '/mylist') {
+      document.title = 'My Watchlist — OmniFlex';
+    } else if (path === '/profile') {
+      document.title = 'Profile & Settings — OmniFlex';
+    } else if (path === '/terms') {
+      document.title = 'Terms of Service — OmniFlex';
+    } else if (path === '/privacy') {
+      document.title = 'Privacy Policy — OmniFlex';
+    }
+  }, [location.pathname]);
+
+  return null;
+}
+
 export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [bypassed, setBypassed] = useState(() => {
@@ -50,6 +81,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <RouteTitleManager />
         <div className="min-h-screen bg-[#060709] text-white flex flex-col font-sans selection:bg-[#E2E8F0]/20 selection:text-white">
           {/* Global Navigation */}
           <Navbar onOpenSearch={() => setIsSearchOpen(true)} />

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Bell, User, Film, Play, LogOut, Bookmark, Settings } from 'lucide-react';
+import { Search, Bell, User, Film, Play, LogOut, Bookmark, Settings, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ onOpenSearch }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
 
   const location = useLocation();
@@ -96,17 +97,19 @@ export default function Navbar({ onOpenSearch }) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/search')}
+            aria-label="Search entertainment catalog"
             className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
               location.pathname === '/search'
                 ? 'bg-[#E2E8F0] text-black border-[#E2E8F0] shadow-sm scale-105'
                 : 'bg-[#111318]/90 hover:bg-white/10 border-white/10 text-[#94A3B8] hover:text-white'
             }`}
-            title="Search Anime"
+            title="Search"
           >
             <Search className="w-4 h-4" />
           </button>
 
           <button
+            aria-label="View notifications"
             className="relative w-10 h-10 rounded-full bg-[#111318]/90 hover:bg-white/10 border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
             title="Notifications"
           >
@@ -119,6 +122,7 @@ export default function Navbar({ onOpenSearch }) {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                aria-label="User profile and settings"
                 className="w-10 h-10 rounded-full bg-[#1E2028] border border-white/20 flex items-center justify-center text-white font-bold ring-1 ring-white/10 hover:border-white/50 transition-all shadow-md overflow-hidden"
                 title={user?.username || 'Profile'}
               >
@@ -171,13 +175,48 @@ export default function Navbar({ onOpenSearch }) {
           ) : (
             <button
               onClick={() => openAuthModal('login')}
+              aria-label="Sign in to your account"
               className="px-5 py-2 rounded-full bg-[#E2E8F0] hover:bg-white text-black text-xs font-bold transition-all shadow-sm hover:scale-105 active:scale-95"
             >
               Sign In
             </button>
           )}
+
+          {/* Mobile Hamburger Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            className="md:hidden w-10 h-10 rounded-full bg-[#111318]/90 hover:bg-white/10 border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Slide-Down Drawer */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-white/10 bg-[#060709]/98 backdrop-blur-2xl px-4 py-4 space-y-1 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+          {navLinks.map((link) => {
+            const isActive = link.path.includes('?')
+              ? location.pathname + location.search === link.path
+              : location.pathname === link.path && !location.search;
+            return (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  isActive
+                    ? 'bg-[#E2E8F0] text-black font-bold shadow-sm'
+                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </header>
   );
 }

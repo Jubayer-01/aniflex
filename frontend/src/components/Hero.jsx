@@ -33,7 +33,13 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
   const banner = currentAnime.bannerImage || currentAnime.coverImage?.extraLarge || 'https://images.alphacoders.com/131/1314905.jpeg';
   const score = currentAnime.score || (currentAnime.averageScore ? (currentAnime.averageScore / 10).toFixed(1) : '9.2');
   const year = currentAnime.year || currentAnime.seasonYear || '2024';
-  const format = currentAnime.format ? currentAnime.format.replace('_', ' ') : 'TV Series';
+  const format = currentAnime.format
+    ? currentAnime.format.replace('_', ' ')
+    : currentAnime.media_type === 'movie'
+    ? 'Movie'
+    : currentAnime.media_type === 'tv'
+    ? 'TV Series'
+    : 'Anime';
   const rating = currentAnime.rating || 'PG-13';
   const description = (currentAnime.description || '').replace(/<[^>]*>?/gm, '') ||
     'A family is attacked by demons and only two members survive - Tanjiro and his sister Nezuko, who is turned into a demon slowly. Tanjiro sets out to become a demon slayer to avenge his family and cure his sister.';

@@ -22,7 +22,18 @@ export default function AuthModal() {
       setError('');
       setSuccess('');
     }
-  }, [authModalState]);
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeAuthModal();
+      }
+    };
+
+    if (authModalState.isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [authModalState, closeAuthModal]);
 
   if (!authModalState.isOpen) return null;
 
@@ -39,10 +50,7 @@ export default function AuthModal() {
         await register(username, email, password);
       } else if (tab === 'forgot') {
         const res = await authAPI.forgotPassword(email);
-        setSuccess(res.data.message || 'Reset link generated successfully.');
-        if (res.data.devToken) {
-          setSuccess(`Reset link sent! (Dev Token: ${res.data.devToken.slice(0, 15)}...)`);
-        }
+        setSuccess(res.data.message || 'Password reset link sent to your email.');
       }
     } catch (err) {
       const msg = err.response?.data?.error || err.message || 'Operation failed';
@@ -53,7 +61,12 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -63,6 +76,7 @@ export default function AuthModal() {
         {/* Close Button */}
         <button
           onClick={closeAuthModal}
+          aria-label="Close authentication modal"
           className="absolute top-4 right-4 text-[#AAA2B7] hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
         >
           <X className="w-5 h-5" />
@@ -74,21 +88,23 @@ export default function AuthModal() {
             <div className="w-8 h-8 rounded-xl bg-[#1E2028] border border-white/20 flex items-center justify-center">
               <Play className="w-4 h-4 fill-[#E2E8F0] text-[#E2E8F0] translate-x-0.5" />
             </div>
-            <span className="text-2xl font-black tracking-wider text-white">
-              ANI<span className="text-[#94A3B8]">FLEX</span>
-            </span>
+            <h2 id="auth-modal-title" className="text-2xl font-black tracking-tight text-white">
+              Omni<span className="text-[#94A3B8]">Flex</span>
+            </h2>
           </div>
           <p className="text-xs text-[#AAA2B7]">
-            {tab === 'login' && 'Sign in to access your personal anime watchlist'}
-            {tab === 'register' && 'Create your free account to track episodes'}
-            {tab === 'forgot' && 'Reset your password'}
+            {tab === 'login' && 'Sign in to access your personal watchlist and sync across devices'}
+            {tab === 'register' && 'Create your free account to track movies, series and anime'}
+            {tab === 'forgot' && 'Reset your account password'}
           </p>
         </div>
 
         {/* Tab Switcher */}
         {tab !== 'forgot' && (
-          <div className="flex bg-[#111318] p-1 rounded-xl mb-6 border border-white/5">
+          <div role="tablist" aria-label="Authentication modes" className="flex bg-[#111318] p-1 rounded-xl mb-6 border border-white/5">
             <button
+              role="tab"
+              aria-selected={tab === 'login'}
               onClick={() => {
                 setTab('login');
                 setError('');
@@ -100,6 +116,8 @@ export default function AuthModal() {
               Sign In
             </button>
             <button
+              role="tab"
+              aria-selected={tab === 'register'}
               onClick={() => {
                 setTab('register');
                 setError('');
@@ -115,14 +133,14 @@ export default function AuthModal() {
 
         {/* Error / Success Notifications */}
         {error && (
-          <div className="mb-4 flex items-center gap-2 p-3 bg-red-950/60 border border-red-800/50 rounded-xl text-red-200 text-xs">
+          <div role="alert" className="mb-4 flex items-center gap-2 p-3 bg-red-950/60 border border-red-800/50 rounded-xl text-red-200 text-xs">
             <AlertCircle className="w-4 h-4 flex-none" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-4 flex items-center gap-2 p-3 bg-green-950/60 border border-green-800/50 rounded-xl text-green-200 text-xs">
+          <div role="status" className="mb-4 flex items-center gap-2 p-3 bg-green-950/60 border border-green-800/50 rounded-xl text-green-200 text-xs">
             <CheckCircle2 className="w-4 h-4 flex-none" />
             <span>{success}</span>
           </div>
@@ -132,15 +150,18 @@ export default function AuthModal() {
         <form onSubmit={handleSubmit} className="space-y-4 text-sm">
           {tab === 'register' && (
             <div>
-              <label className="block text-xs font-bold text-[#AAA2B7] mb-1">Username</label>
+              <label htmlFor="auth-username" className="block text-xs font-bold text-[#AAA2B7] mb-1">Username</label>
               <div className="relative">
-                <User className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="auth-username"
+                  name="username"
                   type="text"
                   required
+                  autoComplete="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="OtakuWarrior"
+                  placeholder="Username"
                   className="w-full bg-[#15171E] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-[#AAA2B7]/50 outline-none focus:border-[#E2E8F0] transition-colors"
                 />
               </div>
@@ -148,12 +169,16 @@ export default function AuthModal() {
           )}
 
           <div>
-            <label className="block text-xs font-bold text-[#AAA2B7] mb-1">Email Address</label>
+            <label htmlFor="auth-email" className="block text-xs font-bold text-[#AAA2B7] mb-1">Email Address</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
+                id="auth-email"
+                name="email"
                 type="email"
                 required
+                autoComplete="email"
+                autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@domain.com"
@@ -165,7 +190,7 @@ export default function AuthModal() {
           {tab !== 'forgot' && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-bold text-[#AAA2B7]">Password</label>
+                <label htmlFor="auth-password" className="text-xs font-bold text-[#AAA2B7]">Password</label>
                 {tab === 'login' && (
                   <button
                     type="button"
@@ -180,10 +205,13 @@ export default function AuthModal() {
                 )}
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="auth-password"
+                  name="password"
                   type="password"
                   required
+                  autoComplete={tab === 'register' ? 'new-password' : 'current-password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
