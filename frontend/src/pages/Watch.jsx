@@ -555,22 +555,24 @@ export default function Watch() {
                 </button>
               </div>
 
-              {/* Audio Language Switcher */}
-              <div className="flex items-center gap-1 bg-[#111318] border border-white/10 rounded-full px-2 py-1 text-xs">
-                <span className="text-[#AAA2B7] text-[11px] px-2 font-medium">Audio:</span>
-                {['Sub (JP)', 'Dub (EN)'].map((srv) => (
-                  <button
-                    key={srv}
-                    onClick={() => setActiveServer(srv)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${activeServer === srv
-                      ? 'bg-[#E2E8F0] text-black shadow-sm'
-                      : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
-                      }`}
-                  >
-                    {srv}
-                  </button>
-                ))}
-              </div>
+              {/* Audio Language Switcher (Anime only) */}
+              {mediaType === 'anime' && (
+                <div className="flex items-center gap-1 bg-[#111318] border border-white/10 rounded-full px-2 py-1 text-xs">
+                  <span className="text-[#AAA2B7] text-[11px] px-2 font-medium">Audio:</span>
+                  {['Sub (JP)', 'Dub (EN)'].map((srv) => (
+                    <button
+                      key={srv}
+                      onClick={() => setActiveServer(srv)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${activeServer === srv
+                        ? 'bg-[#E2E8F0] text-black shadow-sm'
+                        : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                      {srv}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
