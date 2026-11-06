@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Search, Bell, User, Film, Play, LogOut, Bookmark, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -58,8 +59,8 @@ export default function Navbar({ onOpenSearch }) {
           </span>
         </Link>
 
-        {/* Center Pill Navigation */}
-        <nav className="hidden md:flex items-center bg-[#111318]/90 backdrop-blur-lg border border-white/10 rounded-full px-2 py-1.5 shadow-inner">
+        {/* Center Pill Navigation with Smooth Gliding Active Pill */}
+        <nav className="hidden md:flex items-center bg-[#111318]/90 backdrop-blur-lg border border-white/10 rounded-full p-1.5 shadow-inner">
           {navLinks.map((link) => {
             const isActive = link.path.includes('?')
               ? location.pathname + location.search === link.path
@@ -68,13 +69,24 @@ export default function Navbar({ onOpenSearch }) {
               <Link
                 key={link.name}
                 to={link.path}
-                className={`px-5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`relative px-5 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 select-none ${
                   isActive
-                    ? 'bg-[#E2E8F0] text-black font-bold shadow-sm'
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
+                    ? 'text-black font-bold'
+                    : 'text-[#94A3B8] hover:text-white'
                 }`}
               >
-                {link.name}
+                {isActive && (
+                  <motion.div
+                    layoutId="navbar-active-pill"
+                    className="absolute inset-0 bg-[#E2E8F0] rounded-full shadow-sm"
+                    transition={{
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 32,
+                    }}
+                  />
+                )}
+                <span className="relative z-10">{link.name}</span>
               </Link>
             );
           })}
