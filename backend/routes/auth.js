@@ -6,7 +6,11 @@ import { pool } from '../config/db.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_change_in_production';
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('CRITICAL SECURITY ERROR: process.env.JWT_SECRET is missing. Server cannot start without a secure secret.');
+}
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 // Anti-brute force limiter: Max 10 attempts per 15 minutes per IP
@@ -35,15 +39,29 @@ router.post('/register', authLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Username, email, and password are required' });
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  // Sanitize and validate username
+  const cleanUsername = String(username).trim();
+  if (cleanUsername.length < 3 || cleanUsername.length > 30 || !/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+    return res.status(400).json({ error: 'Username must be 3-30 characters (letters, numbers, and underscores only)' });
+  }
+
+  // Validate email format
+  const cleanEmail = String(email).trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Please provide a valid email address' });
+  }
+
+  // Validate password length (min 8 characters)
+  if (typeof password !== 'string' || password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' });
   }
 
   try {
     // Check if user already exists
     const [existing] = await pool.query(
       'SELECT id FROM users WHERE email = ? OR username = ? LIMIT 1',
-      [email, username]
+      [cleanEmail, cleanUsername]
     );
 
     if (existing.length > 0) {
@@ -57,14 +75,14 @@ router.post('/register', authLimiter, async (req, res) => {
     // Insert new user
     const [result] = await pool.query(
       'INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, "user")',
-      [username, email, passwordHash]
+      [cleanUsername, cleanEmail, passwordHash]
     );
 
     const userId = result.insertId;
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: userId, username, email, role: 'user' },
+      { id: userId, username: cleanUsername, email: cleanEmail, role: 'user' },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     );
@@ -72,7 +90,7 @@ router.post('/register', authLimiter, async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: { id: userId, username, email, role: 'user' }
+      user: { id: userId, username: cleanUsername, email: cleanEmail, role: 'user' }
     });
   } catch (error) {
     console.error('Registration error:', error.message);
@@ -199,23 +217,29 @@ router.put('/change-password', authenticateToken, async (req, res) => {
   }
 });
 
-// POST /api/auth/forgot-password (Request reset token)
+// POST /api/auth/forgot-password (Request reset link securely)
 router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
+  const cleanEmail = String(email).trim().toLowerCase();
+
   try {
-    const [rows] = await pool.query('SELECT id, email FROM users WHERE email = ? LIMIT 1', [email]);
+    const [rows] = await pool.query('SELECT id, email FROM users WHERE email = ? LIMIT 1', [cleanEmail]);
     if (rows.length === 0) {
+      // Mitigate user enumeration: identical response for existing and non-existing accounts
       return res.json({ message: 'If your email is registered, you will receive a reset link.' });
     }
 
+    // Generate signed reset token
     const resetToken = jwt.sign({ id: rows[0].id, type: 'reset' }, JWT_SECRET, { expiresIn: '15m' });
-    console.log(`[AUTH] Password reset token for ${email}: ${resetToken}`);
+
+    // In production with live SMTP (Resend/Nodemailer), email the reset URL here:
+    // await sendResetEmail(cleanEmail, `https://aniflex.vercel.app/reset-password?token=${resetToken}`);
+    // NOTE: devToken and console.log are strictly deleted to prevent account takeover
 
     res.json({
-      message: 'Password reset link generated.',
-      devToken: resetToken
+      message: 'If your email is registered, you will receive a password reset link.',
     });
   } catch (error) {
     console.error('Forgot password error:', error.message);
@@ -226,8 +250,8 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
 // POST /api/auth/reset-password (Apply new password with token)
 router.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;
-  if (!token || !newPassword || newPassword.length < 6) {
-    return res.status(400).json({ error: 'Valid token and new password (min 6 chars) required' });
+  if (!token || !newPassword || newPassword.length < 8) {
+    return res.status(400).json({ error: 'Valid token and new password (min 8 chars) required' });
   }
 
   try {

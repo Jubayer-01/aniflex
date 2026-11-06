@@ -17,17 +17,31 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust reverse proxy (Railway, Render, Vercel) for accurate client IP rate limiting
+app.set('trust proxy', 1);
+
 // 1. Security Headers via Helmet (configured to allow external anime CDN images & player embeds)
 app.use(helmet({
   crossOriginResourcePolicy: false,
   crossOriginEmbedderPolicy: false,
 }));
 
-// 2. CORS Restrictions
+// 2. Strict CORS Restrictions (locked down to authorized clients only)
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://aniflex-beta.vercel.app',
+  'https://aniflex.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+].filter(Boolean);
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Dynamically mirror requesting origin to prevent wildcard credential conflicts
-    callback(null, true);
+    // Allow non-browser requests (tools, curl) with no origin header
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked: Origin ${origin} not permitted.`));
   },
   credentials: true,
 }));

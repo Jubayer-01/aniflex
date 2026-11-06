@@ -22,12 +22,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: Handle 401 unauthorized (auto-logout)
+// Response interceptor: Handle 401 unauthorized & 403 token expiration (auto-logout)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Clear token if invalid or expired
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Clear token if invalid, expired, or forbidden
       localStorage.removeItem('aniflex_token');
       localStorage.removeItem('aniflex_user');
     }

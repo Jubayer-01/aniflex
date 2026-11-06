@@ -22,6 +22,9 @@ const Explore = lazy(() => import('./pages/Explore'));
 const Search = lazy(() => import('./pages/Search'));
 const MyList = lazy(() => import('./pages/MyList'));
 const Profile = lazy(() => import('./pages/Profile'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
   return (
@@ -73,6 +76,8 @@ export default function App() {
                 <Route path="/watch/:id" element={<Watch />} />
                 <Route path="/explore" element={<Explore />} />
                 <Route path="/mylist" element={<MyList />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
                 <Route
                   path="/profile"
                   element={
@@ -81,6 +86,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </main>

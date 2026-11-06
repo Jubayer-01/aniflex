@@ -610,6 +610,7 @@ export default function Watch() {
                 className="w-full h-full border-0"
                 allowFullScreen
                 referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} - Full Movie`}
               />
@@ -626,6 +627,7 @@ export default function Watch() {
                 className="w-full h-full border-0"
                 allowFullScreen
                 referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} Season ${tvSeasonNum} Episode ${currentEpisodeNum}`}
               />
@@ -638,6 +640,7 @@ export default function Watch() {
                 className="w-full h-full border-0"
                 allowFullScreen
                 referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} Episode ${currentEpData.number}`}
               />

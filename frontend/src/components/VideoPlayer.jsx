@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import Hls from 'hls.js';
 import {
   Play, Pause, Volume2, VolumeX, Maximize, Minimize,
   SkipForward, SkipBack, Settings, Subtitles, HelpCircle,
@@ -65,10 +64,13 @@ export default function VideoPlayer({
     hudTimeoutRef.current = setTimeout(() => setHudFeedback(null), 1200);
   };
 
-  // Initialize Video / HLS
+  // Initialize Video / HLS with on-demand dynamic chunk loading
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    let hlsInstance = null;
+    let isDisposed = false;
 
     // Reset countdown
     setAutoNextCountdown(null);
@@ -80,27 +82,37 @@ export default function VideoPlayer({
       video.currentTime = parseFloat(savedTime);
     }
 
-    if (Hls.isSupported()) {
-      const hls = new Hls({ enableWorker: true });
-      hlsRef.current = hls;
-      hls.loadSource(videoSource);
-      hls.attachMedia(video);
-
-      hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-        const availableLevels = data.levels.map((lvl, index) => ({
-          id: index,
-          height: lvl.height,
-          bitrate: lvl.bitrate
-        }));
-        setQualities(availableLevels);
-      });
-
-      return () => {
-        hls.destroy();
-      };
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = videoSource;
+    } else {
+      // Lazy load hls.js on demand to reduce initial Watch bundle by ~200 KB
+      import('hls.js').then(({ default: Hls }) => {
+        if (isDisposed || !Hls.isSupported()) return;
+
+        hlsInstance = new Hls({ enableWorker: true });
+        hlsRef.current = hlsInstance;
+        hlsInstance.loadSource(videoSource);
+        hlsInstance.attachMedia(video);
+
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+          const availableLevels = data.levels.map((lvl, index) => ({
+            id: index,
+            height: lvl.height,
+            bitrate: lvl.bitrate
+          }));
+          setQualities(availableLevels);
+        });
+      }).catch((err) => {
+        console.warn('HLS lazy load error:', err);
+      });
     }
+
+    return () => {
+      isDisposed = true;
+      if (hlsInstance) {
+        hlsInstance.destroy();
+      }
+    };
   }, [videoSource, animeId, episodeNum]);
 
   // Handle Progress & Backend Sync

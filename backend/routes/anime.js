@@ -7,15 +7,18 @@ const router = express.Router();
 // GET /api/anime (Browse & filter catalog)
 router.get('/', async (req, res) => {
   const { genre, sort = 'score', search, limit = 24, page = 1 } = req.query;
-  const offset = (Number(page) - 1) * Number(limit);
+  const safeLimit = Math.min(Math.max(1, Number(limit) || 24), 50);
+  const safePage = Math.max(1, Number(page) || 1);
+  const offset = (safePage - 1) * safeLimit;
 
   try {
     let sql = 'SELECT * FROM anime WHERE 1=1';
     const params = [];
 
     if (search) {
+      const cleanSearch = String(search).slice(0, 80);
       sql += ' AND (title_english LIKE ? OR title_romaji LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`);
+      params.push(`%${cleanSearch}%`, `%${cleanSearch}%`);
     }
 
     if (sort === 'score') {
@@ -27,10 +30,10 @@ router.get('/', async (req, res) => {
     }
 
     sql += ' LIMIT ? OFFSET ?';
-    params.push(Number(limit), Number(offset));
+    params.push(safeLimit, offset);
 
     const [rows] = await pool.query(sql, params);
-    res.json({ anime: rows, page: Number(page), limit: Number(limit) });
+    res.json({ anime: rows, page: safePage, limit: safeLimit });
   } catch (error) {
     console.error('Fetch anime error:', error.message);
     res.status(500).json({ error: 'Failed to retrieve anime catalog' });
@@ -40,6 +43,9 @@ router.get('/', async (req, res) => {
 // GET /api/anime/:id (Get single anime with seasons and episodes)
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
+  if (!/^\d+$/.test(String(id))) {
+    return res.status(400).json({ error: 'Invalid anime ID' });
+  }
 
   try {
     const [animeRows] = await pool.query('SELECT * FROM anime WHERE id = ? LIMIT 1', [id]);

@@ -28,12 +28,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+const ALLOWED_STATUSES = ['watching', 'completed', 'plan_to_watch', 'dropped', 'on_hold'];
+
 // POST /api/watchlist (Add or update anime status in user's watchlist)
 router.post('/', async (req, res) => {
   const { animeId, status = 'watching' } = req.body;
 
-  if (!animeId) {
-    return res.status(400).json({ error: 'animeId is required' });
+  if (!animeId || !/^\d+$/.test(String(animeId))) {
+    return res.status(400).json({ error: 'Valid numeric animeId is required' });
+  }
+
+  if (!ALLOWED_STATUSES.includes(status)) {
+    return res.status(400).json({ error: `Invalid status. Allowed values: ${ALLOWED_STATUSES.join(', ')}` });
   }
 
   try {
