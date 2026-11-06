@@ -7,7 +7,8 @@ import { getMovieDetails, getTVDetails, getTVSeason, getTMDBImageUrl } from '../
 import { saveWatchProgress, getLastWatchedEpisode } from '../services/watchHistoryService';
 import {
   ThumbsUp, ThumbsDown, Bookmark, Check, Share2, ArrowLeft,
-  Star, Play, Tv, ChevronDown, ChevronUp, ChevronLeft, ChevronRight
+  Star, Play, Tv, ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
+  RotateCcw, SkipBack, SkipForward
 } from 'lucide-react';
 
 export default function Watch() {
@@ -33,6 +34,7 @@ export default function Watch() {
   const [likes, setLikes] = useState(6640);
   const [dislikes, setDislikes] = useState(127);
   const [userReaction, setUserReaction] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   // TV Multi-Season & Real Episode State (matching unified season selector)
   const [tvSeasonNum, setTvSeasonNum] = useState(1);
@@ -512,6 +514,30 @@ export default function Watch() {
     }
   };
 
+  // Sync episode state if embedded player emits a cross-origin postMessage
+  useEffect(() => {
+    const handlePlayerMessage = (event) => {
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (
+          data?.event === 'episode_change' ||
+          data?.type === 'episode_change' ||
+          data?.action === 'next_episode' ||
+          data?.type === 'next'
+        ) {
+          const nextEp = Number(data.episode || data.episode_number || data.ep);
+          if (nextEp && nextEp !== currentEpisodeNum && nextEp <= totalEpisodes) {
+            handleSelectEpisode(nextEp);
+          }
+        }
+      } catch {
+        // Ignore non-JSON postMessages
+      }
+    };
+    window.addEventListener('message', handlePlayerMessage);
+    return () => window.removeEventListener('message', handlePlayerMessage);
+  }, [currentEpisodeNum, totalEpisodes, anime]);
+
   const handleLike = () => {
     if (userReaction === 'like') {
       setUserReaction(null);
@@ -618,7 +644,7 @@ export default function Watch() {
           {mediaType === 'movie' ? (
             <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
               <iframe
-                key={`movie-${id}-${streamServer}`}
+                key={`movie-${id}-${streamServer}-${reloadKey}`}
                 src={
                   streamServer === 'server2'
                     ? `https://vidsrc.to/embed/movie/${id}`
@@ -634,7 +660,7 @@ export default function Watch() {
           ) : mediaType === 'tv' ? (
             <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
               <iframe
-                key={`tv-${id}-${tvSeasonNum}-${currentEpisodeNum}-${streamServer}`}
+                key={`tv-${id}-${tvSeasonNum}-${currentEpisodeNum}-${streamServer}-${reloadKey}`}
                 src={
                   streamServer === 'server2'
                     ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
@@ -650,14 +676,60 @@ export default function Watch() {
           ) : (
             <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
               <iframe
-                key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}`}
-                src={`https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server2' ? '2' : '1'}&autoPlay=0&autoSkip=1&accent=8955EF`}
+                key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}-${reloadKey}`}
+                src={
+                  streamServer === 'server2'
+                    ? `https://vidsrc.to/embed/anime/${id || 101922}/${currentEpData.number}`
+                    : `https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=0&accent=8955EF`
+                }
                 className="w-full h-full border-0"
                 allowFullScreen
                 referrerPolicy="no-referrer"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} Episode ${currentEpData.number}`}
               />
+            </div>
+          )}
+
+          {/* Quick Episode Navigation & Embed Recovery Bar */}
+          {mediaType !== 'movie' && (
+            <div className="flex items-center justify-between bg-[#0F1115] border border-white/10 rounded-2xl p-2.5 px-4 mt-3 flex-wrap gap-2 shadow-lg">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSelectEpisode(currentEpisodeNum - 1)}
+                  disabled={currentEpisodeNum <= 1}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-xs font-bold text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+                  title="Previous Episode"
+                >
+                  <SkipBack className="w-3.5 h-3.5" />
+                  <span>Prev Ep</span>
+                </button>
+
+                <span className="text-xs font-mono font-bold text-emerald-400 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  Episode {currentEpisodeNum} <span className="text-[#94A3B8] font-normal">/ {totalEpisodes}</span>
+                </span>
+
+                <button
+                  onClick={() => handleSelectEpisode(currentEpisodeNum + 1)}
+                  disabled={currentEpisodeNum >= totalEpisodes}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-900/30 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+                  title="Next Episode"
+                >
+                  <span>Next Ep</span>
+                  <SkipForward className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setReloadKey((prev) => prev + 1)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-xs text-[#94A3B8] hover:text-white transition-all cursor-pointer"
+                  title="Reload embed if stream expires or shows playback disabled"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reload Player</span>
+                </button>
+              </div>
             </div>
           )}
 
