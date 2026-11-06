@@ -617,6 +617,15 @@ export default function Watch() {
                 >
                   Server 2 (Backup Node)
                 </button>
+                <button
+                  onClick={() => setStreamServer('server3')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'server3'
+                    ? 'bg-[#E2E8F0] text-black shadow-sm'
+                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  Server 3 (Alt Stream)
+                </button>
               </div>
 
               {/* Audio Language Switcher (Anime only) */}
@@ -646,13 +655,15 @@ export default function Watch() {
               <iframe
                 key={`movie-${id}-${streamServer}-${reloadKey}`}
                 src={
-                  streamServer === 'server2'
+                  streamServer === 'server3'
+                    ? `https://vidsrc.cc/v2/embed/movie/${id}`
+                    : streamServer === 'server2'
                     ? `https://vidsrc.to/embed/movie/${id}`
                     : `https://vidsrc.me/embed/movie?tmdb=${id}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
-                referrerPolicy="no-referrer"
+                referrerPolicy="origin"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} - Full Movie`}
               />
@@ -662,13 +673,15 @@ export default function Watch() {
               <iframe
                 key={`tv-${id}-${tvSeasonNum}-${currentEpisodeNum}-${streamServer}-${reloadKey}`}
                 src={
-                  streamServer === 'server2'
+                  streamServer === 'server3'
+                    ? `https://vidsrc.cc/v2/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                    : streamServer === 'server2'
                     ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
                     : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${tvSeasonNum}&episode=${currentEpisodeNum}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
-                referrerPolicy="no-referrer"
+                referrerPolicy="origin"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} Season ${tvSeasonNum} Episode ${currentEpisodeNum}`}
               />
@@ -678,13 +691,15 @@ export default function Watch() {
               <iframe
                 key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}-${reloadKey}`}
                 src={
-                  streamServer === 'server2'
-                    ? `https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=2&autoPlay=0&autoSkip=0&accent=8955EF`
-                    : `https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=0&accent=8955EF`
+                  streamServer === 'server3'
+                    ? `https://www.2embed.skin/embed/ani/${id || 101922}/${currentEpData.number}`
+                    : streamServer === 'server2'
+                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=2&autoPlay=0&autoSkip=0&accent=8955EF`
+                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=0&accent=8955EF`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
-                referrerPolicy="no-referrer"
+                referrerPolicy="origin"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} Episode ${currentEpData.number}`}
               />
@@ -749,7 +764,9 @@ export default function Watch() {
                     ? `https://vidlink.pro/movie/${id}`
                     : mediaType === 'tv'
                     ? `https://vidlink.pro/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                    : `https://www.animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server2' ? '2' : '1'}&autoPlay=1`
+                    : streamServer === 'server3'
+                    ? `https://www.2embed.skin/embed/ani/${id || 101922}/${currentEpData.number}`
+                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server2' ? '2' : '1'}&autoPlay=1`
                 }
                 target="_blank"
                 rel="noreferrer"
