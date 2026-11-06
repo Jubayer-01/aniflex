@@ -18,19 +18,19 @@ export default function UnderDevelopment({ onUnlock }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#07080B] text-white flex flex-col items-center justify-center px-4 relative overflow-hidden font-sans selection:bg-[#8955EF] selection:text-white">
+    <div className="min-h-screen bg-[#060709] text-white flex flex-col items-center justify-center px-4 relative overflow-hidden font-sans selection:bg-[#E2E8F0]/20 selection:text-white">
       {/* Background Glowing Ambient Orbs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#8955EF]/15 blur-[140px] pointer-events-none rounded-full" />
-      <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-indigo-500/10 blur-[120px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-white/[0.03] blur-[140px] pointer-events-none rounded-full" />
+      <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-white/[0.02] blur-[120px] pointer-events-none rounded-full" />
 
       {/* Main Glass Card */}
-      <div className="relative z-10 max-w-lg w-full bg-[#111319]/80 border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl text-center">
+      <div className="relative z-10 max-w-lg w-full bg-[#111319]/90 border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl text-center">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#8955EF] to-indigo-500 flex items-center justify-center shadow-lg shadow-[#8955EF]/30">
-            <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+          <div className="w-9 h-9 rounded-xl bg-[#1E2028] border border-white/20 flex items-center justify-center shadow-md">
+            <Play className="w-4 h-4 fill-[#E2E8F0] text-[#E2E8F0] translate-x-0.5" />
           </div>
-          <span className="text-2xl font-black tracking-widest text-white">OmniFlex</span>
+          <span className="text-2xl font-black tracking-widest text-white">Omni<span className="text-[#94A3B8]">Flex</span></span>
         </div>
 
         {/* Status Badge */}
@@ -51,11 +51,11 @@ export default function UnderDevelopment({ onUnlock }) {
         {/* Feature Teasers */}
         <div className="grid grid-cols-2 gap-3 mb-8 text-left text-xs">
           <div className="p-3 rounded-2xl bg-[#161822] border border-white/5 flex items-center gap-2.5">
-            <Sparkles className="w-4 h-4 text-[#8955EF] flex-none" />
+            <Sparkles className="w-4 h-4 text-[#E2E8F0] flex-none" />
             <span className="text-slate-300 font-medium">Faster Video Streams</span>
           </div>
           <div className="p-3 rounded-2xl bg-[#161822] border border-white/5 flex items-center gap-2.5">
-            <Wrench className="w-4 h-4 text-indigo-400 flex-none" />
+            <Wrench className="w-4 h-4 text-[#94A3B8] flex-none" />
             <span className="text-slate-300 font-medium">Enhanced Catalogs</span>
           </div>
         </div>
@@ -77,13 +77,13 @@ export default function UnderDevelopment({ onUnlock }) {
               value={passcode}
               onChange={(e) => setPasscode(e.target.value)}
               className={`w-full px-3.5 py-2 text-xs bg-[#090A0F] border rounded-xl focus:outline-none transition-all ${
-                error ? 'border-red-500 text-red-400' : 'border-white/10 text-white focus:border-[#8955EF]'
+                error ? 'border-red-500 text-red-400' : 'border-white/10 text-white focus:border-[#E2E8F0]'
               }`}
               autoFocus
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-[#8955EF] hover:bg-[#7843DE] text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition-all flex-none"
+              className="px-4 py-2 bg-[#E2E8F0] hover:bg-white text-black rounded-xl text-xs font-bold flex items-center gap-1 transition-all flex-none shadow-sm"
             >
               <span>Enter</span>
               <ArrowRight className="w-3 h-3" />

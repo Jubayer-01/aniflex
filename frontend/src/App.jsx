@@ -29,7 +29,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 function PageLoader() {
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3">
-      <div className="w-10 h-10 border-2 border-[#8955EF] border-t-transparent rounded-full animate-spin" />
+      <div className="w-10 h-10 border-2 border-[#E2E8F0] border-t-transparent rounded-full animate-spin" />
       <span className="text-xs text-[#AAA2B7] font-medium tracking-wide animate-pulse">Loading OmniFlex...</span>
     </div>
   );
@@ -50,7 +50,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-[#09080F] text-white flex flex-col font-sans selection:bg-[#8955EF] selection:text-white">
+        <div className="min-h-screen bg-[#060709] text-white flex flex-col font-sans selection:bg-[#E2E8F0]/20 selection:text-white">
           {/* Global Navigation */}
           <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
 

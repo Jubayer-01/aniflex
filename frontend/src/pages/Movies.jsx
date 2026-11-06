@@ -224,7 +224,7 @@ export default function Movies() {
         <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4 flex-wrap">
           <div>
             <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
-              <Film className="w-6 h-6 text-[#8955EF]" />
+              <Film className="w-6 h-6 text-[#E2E8F0]" />
               <span>Cinema & Movies</span>
             </h2>
             <p className="text-xs text-[#AAA2B7] mt-1">
@@ -240,7 +240,7 @@ export default function Movies() {
                 onClick={() => setActiveTab(cat.id)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === cat.id
-                    ? 'bg-[#8955EF] text-white shadow-md shadow-[#8955EF]/30 scale-105'
+                    ? 'bg-[#E2E8F0] text-black shadow-md font-bold scale-105'
                     : 'bg-[#15171E] text-[#AAA2B7] hover:text-white hover:bg-white/10 border border-white/5'
                 }`}
               >

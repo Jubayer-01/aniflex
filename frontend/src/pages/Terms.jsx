@@ -14,7 +14,7 @@ export default function Terms() {
       </Link>
 
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-2xl bg-[#8955EF]/20 border border-[#8955EF]/30 flex items-center justify-center text-[#8955EF]">
+        <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-[#E2E8F0]">
           <FileText className="w-6 h-6" />
         </div>
         <div>

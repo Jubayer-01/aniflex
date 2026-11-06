@@ -5,7 +5,7 @@ import { Compass, Home, ArrowLeft } from 'lucide-react';
 export default function NotFound() {
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 pt-24 pb-16">
-      <div className="w-20 h-20 rounded-3xl bg-[#15171E] border border-white/10 flex items-center justify-center text-[#8955EF] mb-6 shadow-2xl">
+      <div className="w-20 h-20 rounded-3xl bg-[#15171E] border border-white/10 flex items-center justify-center text-[#E2E8F0] mb-6 shadow-2xl">
         <Compass className="w-10 h-10 animate-spin-slow" />
       </div>
 

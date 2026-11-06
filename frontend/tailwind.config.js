@@ -7,6 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        omniflex: {
+          base: "#060709",
+          darkSteel: "#0F1115",
+          card: "#16181F",
+          primarySteel: "#E2E8F0",
+          accentMetal: "#94A3B8",
+          border: "rgba(255, 255, 255, 0.08)",
+        },
         aniflex: {
           bg: "#060709",
           secondary: "#0F1115",

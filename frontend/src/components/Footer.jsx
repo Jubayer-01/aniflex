@@ -14,7 +14,7 @@ export default function Footer() {
                 <Play className="w-3.5 h-3.5 fill-[#E2E8F0] text-[#E2E8F0] translate-x-0.5" />
               </div>
               <span className="text-xl font-black tracking-tight text-white">
-                Omni<span className="text-[#8955EF]">Flex</span>
+                Omni<span className="text-[#94A3B8]">Flex</span>
               </span>
             </div>
             <p className="text-xs text-[#AAA2B7]">Universal Movies, Series & Anime.</p>

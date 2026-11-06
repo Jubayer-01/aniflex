@@ -233,7 +233,7 @@ export default function Home() {
           <div className="w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-8">
             <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-[#141622] via-[#10121C] to-[#0A0B11] border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
               <div className="space-y-2 text-center md:text-left">
-                <span className="text-xs font-bold text-[#8955EF] tracking-wider uppercase">Unlimited Entertainment</span>
+                <span className="text-xs font-bold text-[#94A3B8] tracking-wider uppercase">Unlimited Entertainment</span>
                 <h3 className="text-2xl sm:text-3xl font-black text-white">One App for All Your Streaming</h3>
                 <p className="text-xs sm:text-sm text-[#AAA2B7] max-w-xl">
                   Switch instantly between Hollywood cinema, Bollywood blockbusters, trending TV dramas, and full anime seasons.
@@ -255,7 +255,7 @@ export default function Home() {
                 </Link>
                 <Link
                   to="/anime"
-                  className="px-5 py-2.5 rounded-full bg-[#8955EF] hover:bg-[#7843DE] text-white font-bold text-xs transition-all shadow-lg shadow-[#8955EF]/30"
+                  className="px-5 py-2.5 rounded-full bg-[#E2E8F0] hover:bg-white text-black font-bold text-xs transition-all shadow-md hover:scale-105 active:scale-95"
                 >
                   Open Anime Hub
                 </Link>
