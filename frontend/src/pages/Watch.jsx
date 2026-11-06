@@ -692,10 +692,10 @@ export default function Watch() {
                 key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}-${reloadKey}`}
                 src={
                   streamServer === 'server3'
-                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=2&autoPlay=1&accent=8955EF`
+                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&accent=E2E8F0&captions=en`
                     : streamServer === 'server2'
-                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=1&accent=8955EF`
-                    : `https://www.2embed.skin/embed/ani/${id || 101922}/${currentEpData.number}`
+                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=1&accent=E2E8F0`
+                    : `https://vidsrc.pm/embed/anime/${id || 101922}/${currentEpData.number}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
@@ -765,8 +765,8 @@ export default function Watch() {
                     : mediaType === 'tv'
                     ? `https://vidlink.pro/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
                     : streamServer === 'server1'
-                    ? `https://www.2embed.skin/embed/ani/${id || 101922}/${currentEpData.number}`
-                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server3' ? '2' : '1'}&autoPlay=1`
+                    ? `https://vidsrc.pm/embed/anime/${id || 101922}/${currentEpData.number}`
+                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0`
                 }
                 target="_blank"
                 rel="noreferrer"
