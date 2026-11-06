@@ -69,8 +69,14 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
         ) : <div />}
 
         {formatBadge && (
-          <span className="bg-white/15 backdrop-blur-md text-white text-[10px] font-semibold px-2 py-0.5 rounded-lg border border-white/20">
-            {formatBadge}
+          <span
+            className={`backdrop-blur-md text-[10px] px-2 py-0.5 rounded-lg border ${
+              formatBadge === 'Movie' || formatBadge === 'HD'
+                ? 'bg-amber-500 text-black border-amber-400 font-black shadow-md'
+                : 'bg-white/15 text-white border-white/20 font-semibold'
+            }`}
+          >
+            {formatBadge === 'Movie' ? 'HD' : formatBadge}
           </span>
         )}
       </div>
