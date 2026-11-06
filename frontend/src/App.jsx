@@ -11,7 +11,7 @@ import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home'; // Eagerly loaded for instant initial render
 
 // TOGGLE: Set to true for maintenance/development mode, false for live public site
-const IS_UNDER_MAINTENANCE = true;
+const IS_UNDER_MAINTENANCE = false;
 
 // Lazy-loaded route chunks to optimize initial bundle size & load speed
 const Movies = lazy(() => import('./pages/Movies'));

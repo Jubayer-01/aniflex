@@ -43,37 +43,6 @@ export const FALLBACK_HERO = {
   genres: ["Action", "Fantasy", "Supernatural"],
 };
 
-export const FALLBACK_CONTINUE_WATCHING = [
-  {
-    id: 113415,
-    title: "Jujutsu Kaisen",
-    episode: "Ep. 12",
-    progress: 60,
-    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/113415-jQBSkxWAAk83.jpg",
-  },
-  {
-    id: 16498,
-    title: "Attack on Titan",
-    episode: "Ep. 8",
-    progress: 40,
-    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/16498-8jpFCOcDmnei.jpg",
-  },
-  {
-    id: 151807,
-    title: "Solo Leveling",
-    episode: "Ep. 6",
-    progress: 70,
-    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/151807-3flSI9yCmsr7.jpg",
-  },
-  {
-    id: 21,
-    title: "One Piece",
-    episode: "Ep. 1021",
-    progress: 30,
-    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21-447543.jpg",
-  },
-];
-
 // Curated solid fallback dataset for all shelves if user is offline or rate limited
 export const FALLBACK_CATALOG = [
   {

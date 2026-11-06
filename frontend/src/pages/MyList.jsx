@@ -20,36 +20,24 @@ export default function MyList() {
     };
   }, []);
 
-  // Curated demo list (persists to localStorage or API)
-  const [watchlist, setWatchlist] = useState([
-    {
-      id: 101922,
-      title: { english: "Demon Slayer: Kimetsu no Yaiba" },
-      coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgLd.jpg" },
-      seasonYear: 2023,
-      averageScore: 92,
-      genres: ["Action", "Fantasy"]
-    },
-    {
-      id: 113415,
-      title: { english: "Jujutsu Kaisen" },
-      coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-bbBWj4pEFseh.jpg" },
-      seasonYear: 2020,
-      averageScore: 87,
-      genres: ["Action", "Supernatural"]
-    },
-    {
-      id: 16498,
-      title: { english: "Attack on Titan" },
-      coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-C6FPmWm59CyP.jpg" },
-      seasonYear: 2013,
-      averageScore: 90,
-      genres: ["Action", "Drama"]
+  // User watchlist loaded from localStorage (clean initial state)
+  const [watchlist, setWatchlist] = useState(() => {
+    try {
+      const stored = localStorage.getItem('aniflex_watchlist');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
     }
-  ]);
+  });
 
   const handleRemove = (id) => {
-    setWatchlist((prev) => prev.filter((item) => item.id !== id));
+    setWatchlist((prev) => {
+      const updated = prev.filter((item) => item.id !== id);
+      try {
+        localStorage.setItem('aniflex_watchlist', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
   };
 
   return (
