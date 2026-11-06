@@ -56,7 +56,7 @@ export default function VideoPlayer({
   // Auto-next countdown state
   const [autoNextCountdown, setAutoNextCountdown] = useState(null); // number or null
 
-  const videoSource = src || 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+  const videoSource = src || '';
 
   const triggerHud = (message) => {
     setHudFeedback(message);
