@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Star, Tv, Flame, Sparkles, Clapperboard } from 'lucide-react';
+import { Play, Star, Tv, Flame, Sparkles, Clapperboard, Loader2 } from 'lucide-react';
 import AnimeCard from '../components/AnimeCard';
 import {
   getPopularSeries,
@@ -14,6 +14,9 @@ const SERIES_CATEGORIES = [
   { id: 'kdrama', label: 'KDramas & Asian Hits' },
   { id: 'drama', label: 'Crime & Drama', genreId: 18 },
   { id: 'scifi', label: 'Sci-Fi & Fantasy', genreId: 10765 },
+  { id: 'action', label: 'Action & Adventure', genreId: 10759 },
+  { id: 'comedy', label: 'Comedy Shows', genreId: 35 },
+  { id: 'animation', label: 'Animation & Anime Series', genreId: 16 },
 ];
 
 export default function Series() {
@@ -23,21 +26,33 @@ export default function Series() {
   const [kdramaList, setKdramaList] = useState([]);
   const [genreSeries, setGenreSeries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(3);
+  const [genrePage, setGenrePage] = useState(1);
 
+  // Multi-page batch loader on mount (fetches pages 1, 2, and 3 concurrently)
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
 
     async function loadSeriesCatalogs() {
       try {
-        const [shows, kdramas] = await Promise.all([
+        const [s1, s2, s3, k1, k2, k3] = await Promise.all([
           getPopularSeries(1),
+          getPopularSeries(2),
+          getPopularSeries(3),
           getKDramas(1),
+          getKDramas(2),
+          getKDramas(3),
         ]);
 
         if (!isMounted) return;
-        setSeriesList(shows);
-        setKdramaList(kdramas);
+        const allSeries = [...s1, ...s2, ...s3];
+        const allKdramas = [...k1, ...k2, ...k3];
+
+        setSeriesList(allSeries);
+        setKdramaList(allKdramas);
+        setPage(3);
       } catch (err) {
         console.error('Series catalog fetch error:', err);
       } finally {
@@ -59,9 +74,13 @@ export default function Series() {
 
     if (currentCat?.genreId) {
       setLoading(true);
-      getPopularSeries(1, currentCat.genreId).then((data) => {
+      setGenrePage(2);
+      Promise.all([
+        getPopularSeries(1, currentCat.genreId),
+        getPopularSeries(2, currentCat.genreId),
+      ]).then(([g1, g2]) => {
         if (!isMounted) return;
-        setGenreSeries(data);
+        setGenreSeries([...g1, ...g2]);
         setLoading(false);
       });
     }
@@ -70,6 +89,43 @@ export default function Series() {
       isMounted = false;
     };
   }, [activeTab]);
+
+  // Load More Handler (Infinite catalog expansion for series)
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    const currentCat = SERIES_CATEGORIES.find((c) => c.id === activeTab);
+
+    try {
+      if (currentCat?.genreId) {
+        const nextPage = genrePage + 1;
+        const newBatch = await getPopularSeries(nextPage, currentCat.genreId);
+        if (newBatch && newBatch.length > 0) {
+          setGenreSeries((prev) => [...prev, ...newBatch]);
+          setGenrePage(nextPage);
+        }
+      } else if (activeTab === 'kdrama') {
+        const nextPage = page + 1;
+        const newBatch = await getKDramas(nextPage);
+        if (newBatch && newBatch.length > 0) {
+          setKdramaList((prev) => [...prev, ...newBatch]);
+          setPage(nextPage);
+        }
+      } else {
+        const nextPage = page + 1;
+        const [nextSeries, nextKdramas] = await Promise.all([
+          getPopularSeries(nextPage),
+          getKDramas(nextPage),
+        ]);
+        if (nextSeries?.length > 0) setSeriesList((prev) => [...prev, ...nextSeries]);
+        if (nextKdramas?.length > 0) setKdramaList((prev) => [...prev, ...nextKdramas]);
+        setPage(nextPage);
+      }
+    } catch (err) {
+      console.error('Load more series failed:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // Featured Hero Series
   const heroSeries = useMemo(() => {
@@ -139,7 +195,7 @@ export default function Series() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => handlePlaySeries(heroSeries)}
-                  className="flex items-center gap-2.5 px-6 py-3 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95"
+                  className="flex items-center gap-2.5 px-6 py-3 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-black text-black" />
                   <span>Start Season 1</span>
@@ -169,7 +225,7 @@ export default function Series() {
               <button
                 key={cat.id}
                 onClick={() => setActiveTab(cat.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === cat.id
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105'
                     : 'bg-[#15171E] text-[#AAA2B7] hover:text-white hover:bg-white/10 border border-white/5'
@@ -186,7 +242,7 @@ export default function Series() {
       <section className="w-full px-4 sm:px-6 md:px-10 lg:px-12">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {Array.from({ length: 12 }).map((_, i) => (
+            {Array.from({ length: 18 }).map((_, i) => (
               <div
                 key={i}
                 className="aspect-[2/3] rounded-2xl bg-[#15171E] animate-pulse border border-white/5"
@@ -194,24 +250,50 @@ export default function Series() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
-            {displayedSeries.map((series) => (
-              <AnimeCard
-                key={series.id}
-                anime={{
-                  id: series.id,
-                  title: series.name || series.original_name,
-                  poster_path: series.poster_path,
-                  vote_average: series.vote_average,
-                  first_air_date: series.first_air_date,
-                  media_type: 'tv',
-                }}
-                className="w-full"
-                onClick={() => handlePlaySeries(series)}
-                onPlay={() => handlePlaySeries(series)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+              {displayedSeries.map((series) => (
+                <AnimeCard
+                  key={series.id}
+                  anime={{
+                    id: series.id,
+                    title: series.name || series.original_name,
+                    poster_path: series.poster_path,
+                    vote_average: series.vote_average,
+                    first_air_date: series.first_air_date,
+                    media_type: 'tv',
+                  }}
+                  className="w-full"
+                  onClick={() => handlePlaySeries(series)}
+                  onPlay={() => handlePlaySeries(series)}
+                />
+              ))}
+            </div>
+
+            {/* Load More Series Button */}
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 py-3.5 bg-[#15171E] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-2xl border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+                    <span>Fetching more TV series...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 text-indigo-400" />
+                    <span>Load More Series</span>
+                  </>
+                )}
+              </button>
+              <p className="text-xs text-[#AAA2B7]/70 font-mono">
+                Showing {displayedSeries.length} TV series from TMDB catalog
+              </p>
+            </div>
+          </>
         )}
       </section>
     </div>

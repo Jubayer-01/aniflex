@@ -69,20 +69,23 @@ export default function Home() {
     async function loadOmniData() {
       try {
         setLoading(true);
-        const [omniTrending, hollywood, bollywood, tv, animeCatalog] = await Promise.all([
+        const [omniTrending, hw1, hw2, bw1, bw2, tv1, tv2, animeCatalog] = await Promise.all([
           getTrendingAll(),
           getHollywoodMovies(1),
+          getHollywoodMovies(2),
           getBollywoodMovies(1),
+          getBollywoodMovies(2),
           getPopularSeries(1),
+          getPopularSeries(2),
           getHomePageCatalog(false),
         ]);
 
         if (!isMounted) return;
 
         setTrendingAll(omniTrending || []);
-        setHollywoodMovies(hollywood || []);
-        setBollywoodMovies(bollywood || []);
-        setTvSeries(tv || []);
+        setHollywoodMovies([...(hw1 || []), ...(hw2 || [])]);
+        setBollywoodMovies([...(bw1 || []), ...(bw2 || [])]);
+        setTvSeries([...(tv1 || []), ...(tv2 || [])]);
 
         const topAnime = animeCatalog?.trending || [];
         setAnimeList(topAnime);

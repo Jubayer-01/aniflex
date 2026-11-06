@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Star, Film, Flame, Sparkles, Clapperboard, Filter } from 'lucide-react';
+import { Play, Star, Film, Flame, Sparkles, Clapperboard, Filter, Loader2 } from 'lucide-react';
 import AnimeCard from '../components/AnimeCard';
 import {
   getHollywoodMovies,
@@ -16,6 +16,9 @@ const MOVIE_CATEGORIES = [
   { id: 'action', label: 'Action & Thrillers', genreId: 28 },
   { id: 'scifi', label: 'Sci-Fi & Fantasy', genreId: 878 },
   { id: 'comedy', label: 'Comedy', genreId: 35 },
+  { id: 'horror', label: 'Horror & Suspense', genreId: 27 },
+  { id: 'crime', label: 'Crime & Mystery', genreId: 80 },
+  { id: 'animation', label: 'Animation Features', genreId: 16 },
 ];
 
 export default function Movies() {
@@ -25,21 +28,33 @@ export default function Movies() {
   const [bollywoodList, setBollywoodList] = useState([]);
   const [genreMovies, setGenreMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(3);
+  const [genrePage, setGenrePage] = useState(1);
 
+  // Multi-page batch loader on mount (fetches pages 1, 2, and 3 concurrently)
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
 
     async function loadMovieCatalogs() {
       try {
-        const [hollywood, bollywood] = await Promise.all([
+        const [hw1, hw2, hw3, bw1, bw2, bw3] = await Promise.all([
           getHollywoodMovies(1),
+          getHollywoodMovies(2),
+          getHollywoodMovies(3),
           getBollywoodMovies(1),
+          getBollywoodMovies(2),
+          getBollywoodMovies(3),
         ]);
 
         if (!isMounted) return;
-        setHollywoodList(hollywood.length > 0 ? hollywood : FALLBACK_MOVIES);
-        setBollywoodList(bollywood.length > 0 ? bollywood : []);
+        const allHollywood = [...hw1, ...hw2, ...hw3];
+        const allBollywood = [...bw1, ...bw2, ...bw3];
+
+        setHollywoodList(allHollywood.length > 0 ? allHollywood : FALLBACK_MOVIES);
+        setBollywoodList(allBollywood);
+        setPage(3);
       } catch (err) {
         console.error('Movies catalog fetch error:', err);
       } finally {
@@ -61,9 +76,14 @@ export default function Movies() {
 
     if (currentCat?.genreId) {
       setLoading(true);
-      getHollywoodMovies(1, currentCat.genreId).then((data) => {
+      setGenrePage(2);
+      // Fetch pages 1 and 2 of this genre concurrently
+      Promise.all([
+        getHollywoodMovies(1, currentCat.genreId),
+        getHollywoodMovies(2, currentCat.genreId),
+      ]).then(([g1, g2]) => {
         if (!isMounted) return;
-        setGenreMovies(data);
+        setGenreMovies([...g1, ...g2]);
         setLoading(false);
       });
     }
@@ -72,6 +92,51 @@ export default function Movies() {
       isMounted = false;
     };
   }, [activeTab]);
+
+  // Load More Handler (Infinite catalog expansion)
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    const currentCat = MOVIE_CATEGORIES.find((c) => c.id === activeTab);
+
+    try {
+      if (currentCat?.genreId) {
+        const nextPage = genrePage + 1;
+        const newBatch = await getHollywoodMovies(nextPage, currentCat.genreId);
+        if (newBatch && newBatch.length > 0) {
+          setGenreMovies((prev) => [...prev, ...newBatch]);
+          setGenrePage(nextPage);
+        }
+      } else if (activeTab === 'bollywood') {
+        const nextPage = page + 1;
+        const newBatch = await getBollywoodMovies(nextPage);
+        if (newBatch && newBatch.length > 0) {
+          setBollywoodList((prev) => [...prev, ...newBatch]);
+          setPage(nextPage);
+        }
+      } else if (activeTab === 'hollywood') {
+        const nextPage = page + 1;
+        const newBatch = await getHollywoodMovies(nextPage);
+        if (newBatch && newBatch.length > 0) {
+          setHollywoodList((prev) => [...prev, ...newBatch]);
+          setPage(nextPage);
+        }
+      } else {
+        // 'all': fetch next page of both Hollywood and Bollywood
+        const nextPage = page + 1;
+        const [nextHw, nextBw] = await Promise.all([
+          getHollywoodMovies(nextPage),
+          getBollywoodMovies(nextPage),
+        ]);
+        if (nextHw?.length > 0) setHollywoodList((prev) => [...prev, ...nextHw]);
+        if (nextBw?.length > 0) setBollywoodList((prev) => [...prev, ...nextBw]);
+        setPage(nextPage);
+      }
+    } catch (err) {
+      console.error('Load more movies failed:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // Featured Hero Movie
   const heroMovie = useMemo(() => {
@@ -143,7 +208,7 @@ export default function Movies() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => handlePlayMovie(heroMovie)}
-                  className="flex items-center gap-2.5 px-6 py-3 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95"
+                  className="flex items-center gap-2.5 px-6 py-3 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-black text-black" />
                   <span>Watch Movie</span>
@@ -173,7 +238,7 @@ export default function Movies() {
               <button
                 key={cat.id}
                 onClick={() => setActiveTab(cat.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === cat.id
                     ? 'bg-[#8955EF] text-white shadow-md shadow-[#8955EF]/30 scale-105'
                     : 'bg-[#15171E] text-[#AAA2B7] hover:text-white hover:bg-white/10 border border-white/5'
@@ -190,7 +255,7 @@ export default function Movies() {
       <section className="w-full px-4 sm:px-6 md:px-10 lg:px-12">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {Array.from({ length: 12 }).map((_, i) => (
+            {Array.from({ length: 18 }).map((_, i) => (
               <div
                 key={i}
                 className="aspect-[2/3] rounded-2xl bg-[#15171E] animate-pulse border border-white/5"
@@ -198,24 +263,50 @@ export default function Movies() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
-            {displayedMovies.map((movie) => (
-              <AnimeCard
-                key={movie.id}
-                anime={{
-                  id: movie.id,
-                  title: movie.title || movie.original_title,
-                  poster_path: movie.poster_path,
-                  vote_average: movie.vote_average,
-                  release_date: movie.release_date,
-                  media_type: 'movie',
-                }}
-                className="w-full"
-                onClick={() => handlePlayMovie(movie)}
-                onPlay={() => handlePlayMovie(movie)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+              {displayedMovies.map((movie) => (
+                <AnimeCard
+                  key={movie.id}
+                  anime={{
+                    id: movie.id,
+                    title: movie.title || movie.original_title,
+                    poster_path: movie.poster_path,
+                    vote_average: movie.vote_average,
+                    release_date: movie.release_date,
+                    media_type: 'movie',
+                  }}
+                  className="w-full"
+                  onClick={() => handlePlayMovie(movie)}
+                  onPlay={() => handlePlayMovie(movie)}
+                />
+              ))}
+            </div>
+
+            {/* Load More Movies Button */}
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 py-3.5 bg-[#15171E] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-2xl border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+                    <span>Fetching more cinema titles...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>Load More Movies</span>
+                  </>
+                )}
+              </button>
+              <p className="text-xs text-[#AAA2B7]/70 font-mono">
+                Showing {displayedMovies.length} movies from TMDB cinema catalog
+              </p>
+            </div>
+          </>
         )}
       </section>
     </div>

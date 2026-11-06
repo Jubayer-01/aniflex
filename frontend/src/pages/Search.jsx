@@ -8,6 +8,7 @@ import {
   getHomePageCatalog,
   FALLBACK_CATALOG
 } from '../services/anilistService';
+import { searchTMDB } from '../services/tmdbService';
 
 const POPULAR_TAGS = [
   'Solo Leveling',
@@ -69,15 +70,35 @@ export default function Search() {
     const instantLocal = getLocalCatalogMatches(clean);
     setResults(instantLocal);
 
-    // 2. Query remote AniList in parallel for full database breadth
+    // 2. Query remote AniList and TMDB (Movies & Series) in parallel
     let isCancelled = false;
     setLoading(true);
 
     const timer = setTimeout(async () => {
       try {
-        const fullResults = await instantAlphabetSearch(clean, 30);
-        if (!isCancelled && fullResults && fullResults.length > 0) {
-          setResults(fullResults);
+        const [fullAnime, tmdbData] = await Promise.all([
+          instantAlphabetSearch(clean, 24),
+          searchTMDB(clean, 1),
+        ]);
+
+        if (isCancelled) return;
+
+        const formattedTMDB = (tmdbData || []).map((m) => ({
+          id: m.id,
+          title: { english: m.title || m.name, romaji: m.original_title || m.original_name },
+          coverImage: {
+            extraLarge: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+            large: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+          },
+          bannerImage: m.backdrop_path ? `https://image.tmdb.org/t/p/w500${m.backdrop_path}` : null,
+          averageScore: Math.round((m.vote_average || 7) * 10),
+          seasonYear: m.release_date?.slice(0, 4) || m.first_air_date?.slice(0, 4) || '2025',
+          media_type: m.media_type || (m.first_air_date ? 'tv' : 'movie'),
+        }));
+
+        const merged = [...(fullAnime || []), ...formattedTMDB];
+        if (merged.length > 0) {
+          setResults(merged);
         }
       } catch (err) {
         console.warn('Search fetch error:', err);
@@ -116,8 +137,14 @@ export default function Search() {
     inputRef.current?.focus();
   };
 
-  const handleOpenWatch = (anime) => {
-    navigate(`/watch/${anime.id}`);
+  const handleOpenWatch = (item) => {
+    if (item.media_type === 'movie') {
+      navigate(`/watch/movie/${item.id}`);
+    } else if (item.media_type === 'tv') {
+      navigate(`/watch/tv/${item.id}?s=1&e=1`);
+    } else {
+      navigate(`/watch/${item.id}`);
+    }
   };
 
   const isSearching = Boolean(query.trim());
