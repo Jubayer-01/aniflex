@@ -90,43 +90,32 @@ export default function Home() {
         const topAnime = animeCatalog?.trending || [];
         setAnimeList(topAnime);
 
-        // Build a blended Hero banner (Movie + TV + Anime)
-        const blendedHeroes = [];
-        if (omniTrending?.[0]) {
-          const m = omniTrending[0];
-          blendedHeroes.push({
-            id: m.id,
-            title: { english: m.title || m.name, romaji: m.title || m.name },
-            bannerImage: getTMDBImageUrl(m.backdrop_path, 'original'),
-            coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w500') },
-            score: m.vote_average ? m.vote_average.toFixed(1) : '8.5',
-            year: m.release_date?.slice(0, 4) || m.first_air_date?.slice(0, 4) || '2026',
-            description: m.overview,
-            genres: [m.media_type === 'tv' ? 'TV Series' : 'Blockbuster Movie'],
-            media_type: m.media_type || 'movie',
-          });
-        }
+        // Build Hero banner strictly from trending Movies & TV Series (Zero Anime)
+        const movieTvHeroes = (omniTrending || []).slice(0, 6).map((m) => ({
+          id: m.id,
+          title: { english: m.title || m.name, romaji: m.original_title || m.original_name },
+          bannerImage: getTMDBImageUrl(m.backdrop_path, 'original'),
+          coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w500') },
+          score: m.vote_average ? m.vote_average.toFixed(1) : '8.5',
+          year: m.release_date?.slice(0, 4) || m.first_air_date?.slice(0, 4) || '2026',
+          description: m.overview,
+          genres: [m.media_type === 'tv' ? 'TV Series' : 'Blockbuster Movie'],
+          media_type: m.media_type || (m.first_air_date ? 'tv' : 'movie'),
+        }));
 
-        if (topAnime?.[0]) {
-          blendedHeroes.push(topAnime[0]);
-        }
+        const fallbackMovieHero = {
+          id: 969681,
+          title: { english: 'The Odyssey', romaji: 'The Odyssey' },
+          bannerImage: 'https://image.tmdb.org/t/p/original/zOpe0eHbgF3pr5NGaswhR48b6p0.jpg',
+          coverImage: { extraLarge: 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg' },
+          score: '8.5',
+          year: '2025',
+          description: 'After a decade of battle, a Greek king embarks on a perilous voyage home.',
+          genres: ['Blockbuster Movie'],
+          media_type: 'movie',
+        };
 
-        if (bollywood?.[0]) {
-          const b = bollywood[0];
-          blendedHeroes.push({
-            id: b.id,
-            title: { english: b.title || b.original_title, romaji: b.title || b.original_title },
-            bannerImage: getTMDBImageUrl(b.backdrop_path, 'original'),
-            coverImage: { extraLarge: getTMDBImageUrl(b.poster_path, 'w500') },
-            score: b.vote_average ? b.vote_average.toFixed(1) : '8.2',
-            year: b.release_date?.slice(0, 4) || '2026',
-            description: b.overview,
-            genres: ['Bollywood Cinema'],
-            media_type: 'movie',
-          });
-        }
-
-        setHeroItems(blendedHeroes.length > 0 ? blendedHeroes : [FALLBACK_HERO]);
+        setHeroItems(movieTvHeroes.length > 0 ? movieTvHeroes : [fallbackMovieHero]);
       } catch (err) {
         console.error('Omni home load error:', err);
       } finally {

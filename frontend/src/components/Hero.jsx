@@ -46,6 +46,16 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
     setActiveIdx((prev) => (prev + 1) % trendingList.length);
   };
 
+  const handlePlayNow = () => {
+    if (currentAnime.media_type === 'movie') {
+      navigate(`/watch/movie/${currentAnime.id}`);
+    } else if (currentAnime.media_type === 'tv') {
+      navigate(`/watch/tv/${currentAnime.id}?s=1&e=1`);
+    } else {
+      navigate(`/watch/${currentAnime.id || 101922}`);
+    }
+  };
+
   return (
     <section
       onMouseEnter={() => setIsPaused(true)}
@@ -166,8 +176,8 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
           <div className="flex flex-wrap items-center gap-2.5 pt-1.5">
             {/* Play Now: Solid White Pill */}
             <button
-              onClick={() => navigate(`/watch/${currentAnime.id || 101922}`)}
-              className="flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-xl"
+              onClick={handlePlayNow}
+              className="flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-xl cursor-pointer"
             >
               <Play className="w-4 h-4 fill-black text-black" />
               <span>Play Now</span>
@@ -176,7 +186,7 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
             {/* + Watchlist: Translucent Glass Pill */}
             <button
               onClick={() => setIsSaved(!isSaved)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 hover:scale-105 active:scale-95 border backdrop-blur-md ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 hover:scale-105 active:scale-95 border backdrop-blur-md cursor-pointer ${
                 isSaved
                   ? 'bg-[#E2E8F0] text-black border-[#E2E8F0] shadow-md'
                   : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
@@ -190,18 +200,18 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
             <button
               onClick={() => onOpenDetails && onOpenDetails(currentAnime)}
               aria-label="More Info"
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 shadow-md"
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
               title="More Details"
             >
               <Info className="w-4 h-4" />
             </button>
 
-            {/* Circular Film / Trailer Button */}
+            {/* Circular Film / Watch Button */}
             <button
-              onClick={() => navigate(`/watch/${currentAnime.id || 101922}`)}
-              aria-label="Episodes & Stream"
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 shadow-md"
-              title="Episodes"
+              onClick={handlePlayNow}
+              aria-label="Stream Now"
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
+              title="Stream Now"
             >
               <Film className="w-4 h-4" />
             </button>
