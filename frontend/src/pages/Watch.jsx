@@ -649,6 +649,19 @@ export default function Watch() {
             </div>
           </div>
 
+          {/* Upcoming Release Notice */}
+          {Boolean(anime?.release_date && new Date(anime.release_date) > new Date()) && (
+            <div className="mb-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-center gap-3 text-amber-200 shadow-lg">
+              <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-black text-xs font-black uppercase tracking-wider shrink-0">
+                Coming Soon
+              </span>
+              <p className="text-xs sm:text-sm font-medium">
+                <strong>{animeTitle}</strong> is an upcoming release scheduled for{' '}
+                <span className="font-bold underline text-white">{anime.release_date}</span>. Streaming nodes activate once the film officially premieres.
+              </p>
+            </div>
+          )}
+
           {/* Video Player Display */}
           {mediaType === 'movie' ? (
             <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
@@ -656,7 +669,7 @@ export default function Watch() {
                 key={`movie-${id}-${streamServer}-${reloadKey}`}
                 src={
                   streamServer === 'server3'
-                    ? `https://vidsrc.cc/v2/embed/movie/${id}`
+                    ? `https://vidsrc.pm/embed/movie/${id}`
                     : streamServer === 'server2'
                     ? `https://vidsrc.to/embed/movie/${id}`
                     : `https://vidsrc.me/embed/movie?tmdb=${id}`
@@ -674,7 +687,7 @@ export default function Watch() {
                 key={`tv-${id}-${tvSeasonNum}-${currentEpisodeNum}-${streamServer}-${reloadKey}`}
                 src={
                   streamServer === 'server3'
-                    ? `https://vidsrc.cc/v2/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                    ? `https://vidsrc.pm/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
                     : streamServer === 'server2'
                     ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
                     : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${tvSeasonNum}&episode=${currentEpisodeNum}`

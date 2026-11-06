@@ -30,16 +30,22 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
     (anime.release_date ? anime.release_date.slice(0, 4) : null) ||
     (anime.first_air_date ? anime.first_air_date.slice(0, 4) : null);
 
-  const formatBadge =
-    anime.media_type === 'movie'
-      ? 'Movie'
-      : anime.media_type === 'tv'
-      ? 'Series'
+  const isUpcoming = Boolean(
+    (anime.release_date && new Date(anime.release_date) > new Date()) ||
+    (anime.first_air_date && new Date(anime.first_air_date) > new Date())
+  );
+
+  const formatBadge = isUpcoming
+    ? 'COMING SOON'
+    : anime.media_type === 'movie'
+    ? 'Movie'
+    : anime.media_type === 'tv'
+    ? 'Series'
+    : anime.format
+    ? anime.format === 'TV_SHORT'
+      ? 'TV'
       : anime.format
-      ? anime.format === 'TV_SHORT'
-        ? 'TV'
-        : anime.format
-      : anime.genres?.[0] || 'HD';
+    : anime.genres?.[0] || 'HD';
 
   return (
     <div
@@ -72,7 +78,9 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
         {formatBadge && (
           <span
             className={`backdrop-blur-md text-[10px] px-2 py-0.5 rounded-lg border ${
-              formatBadge === 'Movie' || formatBadge === 'HD'
+              formatBadge === 'COMING SOON'
+                ? 'bg-rose-500 text-white border-rose-400 font-black shadow-md tracking-wider'
+                : formatBadge === 'Movie' || formatBadge === 'HD'
                 ? 'bg-amber-500 text-black border-amber-400 font-black shadow-md'
                 : 'bg-white/15 text-white border-white/20 font-semibold'
             }`}
