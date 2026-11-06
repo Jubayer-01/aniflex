@@ -30,7 +30,7 @@ export default function UnderDevelopment({ onUnlock }) {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#8955EF] to-indigo-500 flex items-center justify-center shadow-lg shadow-[#8955EF]/30">
             <Play className="w-4 h-4 text-white fill-white ml-0.5" />
           </div>
-          <span className="text-2xl font-black tracking-widest text-white">ANIFLEX</span>
+          <span className="text-2xl font-black tracking-widest text-white">OmniFlex</span>
         </div>
 
         {/* Status Badge */}
@@ -44,7 +44,7 @@ export default function UnderDevelopment({ onUnlock }) {
           We’re Crafting Something Great
         </h1>
         <p className="text-sm text-[#AAA2B7] leading-relaxed mb-8">
-          ANIFLEX is currently offline for scheduled infrastructure upgrades, database optimizations, and design tuning.
+          OmniFlex is currently offline for scheduled infrastructure upgrades, database optimizations, and design tuning.
           The platform will return shortly.
         </p>
 
@@ -94,7 +94,7 @@ export default function UnderDevelopment({ onUnlock }) {
 
       {/* Footer copyright note */}
       <div className="relative z-10 mt-8 text-[11px] text-[#AAA2B7]/40">
-        © 2026 ANIFLEX • Private Development Sandbox
+        © 2026 OmniFlex • Private Development Sandbox
       </div>
     </div>
   );

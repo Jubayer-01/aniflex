@@ -53,8 +53,8 @@ export default function Navbar({ onOpenSearch }) {
           <div className="w-9 h-9 rounded-xl bg-[#1E2028] border border-white/20 flex items-center justify-center shadow-md group-hover:border-white/40 transition-all">
             <Play className="w-4 h-4 fill-[#E2E8F0] text-[#E2E8F0] translate-x-0.5" />
           </div>
-          <span className="text-2xl font-black tracking-wider text-white">
-            ANI<span className="text-[#94A3B8]">FLEX</span>
+          <span className="text-2xl font-black tracking-tight text-white">
+            Omni<span className="text-[#8955EF]">Flex</span>
           </span>
         </Link>
 

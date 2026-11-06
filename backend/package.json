@@ -1,7 +1,7 @@
 {
   "name": "aniflex-backend",
   "version": "1.0.0",
-  "description": "ANIFLEX Streaming Platform REST API",
+  "description": "OmniFlex Streaming Platform REST API",
   "main": "server.js",
   "type": "module",
   "scripts": {

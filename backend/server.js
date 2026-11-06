@@ -70,7 +70,7 @@ app.use('/api/movies', movieRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'ANIFLEX API',
+    service: 'OmniFlex API',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
   });
@@ -89,7 +89,7 @@ app.use((err, req, res, next) => {
 
 // Start Server
 app.listen(PORT, async () => {
-  console.log(`ANIFLEX Backend running on http://localhost:${PORT}`);
+  console.log(`OmniFlex Backend running on http://localhost:${PORT}`);
   const connected = await testConnection();
   if (connected) {
     await initDatabase();

@@ -27,14 +27,14 @@ export default function Terms() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">1. Acceptance of Terms</h2>
           <p>
-            By accessing or using ANIFLEX, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
+            By accessing or using OmniFlex, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
           </p>
         </section>
 
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">2. Informational & Educational Demonstration</h2>
           <p>
-            ANIFLEX is an open-source omni-entertainment catalog demonstration platform. ANIFLEX does not store, host, or upload video files onto its servers. All video streams and metadata are indexed from publicly accessible third-party APIs (including TMDB and AniList) and external embed providers.
+            OmniFlex is an open-source omni-entertainment catalog demonstration platform. OmniFlex does not store, host, or upload video files onto its servers. All video streams and metadata are indexed from publicly accessible third-party APIs (including TMDB and AniList) and external embed providers.
           </p>
         </section>
 
@@ -55,3 +55,4 @@ export default function Terms() {
     </div>
   );
 }
+

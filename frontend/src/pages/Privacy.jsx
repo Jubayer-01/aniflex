@@ -27,7 +27,7 @@ export default function Privacy() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">1. Information We Collect</h2>
           <p>
-            When registering an account on ANIFLEX, we collect your username and email address. Password credentials are salted and hashed using bcrypt before storage; plaintext passwords are never saved or accessible.
+            When registering an account on OmniFlex, we collect your username and email address. Password credentials are salted and hashed using bcrypt before storage; plaintext passwords are never saved or accessible.
           </p>
         </section>
 
@@ -55,3 +55,4 @@ export default function Privacy() {
     </div>
   );
 }
+

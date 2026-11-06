@@ -70,7 +70,7 @@ export default function Profile() {
 
         <div className="space-y-2 text-center sm:text-left flex-1">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-            <h1 className="text-2xl sm:text-3xl font-black text-white">{user?.username || 'ANIFLEX Member'}</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-white">{user?.username || 'OmniFlex Member'}</h1>
             <span className="flex items-center gap-1 bg-white/10 text-gray-200 border border-white/20 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
               <Sparkles className="w-3 h-3" /> {user?.role === 'admin' ? 'Administrator' : 'VIP Member'}
             </span>

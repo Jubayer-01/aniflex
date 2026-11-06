@@ -13,11 +13,11 @@ export default function Footer() {
               <div className="w-7 h-7 rounded-lg bg-[#1E2028] border border-white/20 flex items-center justify-center">
                 <Play className="w-3.5 h-3.5 fill-[#E2E8F0] text-[#E2E8F0] translate-x-0.5" />
               </div>
-              <span className="text-xl font-black tracking-wider text-white">
-                ANI<span className="text-[#94A3B8]">FLEX</span>
+              <span className="text-xl font-black tracking-tight text-white">
+                Omni<span className="text-[#8955EF]">Flex</span>
               </span>
             </div>
-            <p className="text-xs text-[#AAA2B7]">Your Anime. Your Universe.</p>
+            <p className="text-xs text-[#AAA2B7]">Universal Movies, Series & Anime.</p>
           </div>
 
           {/* Links */}
@@ -58,7 +58,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-6 text-center text-xs text-[#AAA2B7]/60">
-          © {new Date().getFullYear()} ANIFLEX. For demo, personal and educational purposes. All anime artwork and trademarks belong to their respective creators.
+          © {new Date().getFullYear()} OmniFlex. For demo, personal and educational purposes. All media and trademarks belong to their respective creators.
         </div>
       </div>
     </footer>

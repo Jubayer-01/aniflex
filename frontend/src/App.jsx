@@ -30,7 +30,7 @@ function PageLoader() {
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3">
       <div className="w-10 h-10 border-2 border-[#8955EF] border-t-transparent rounded-full animate-spin" />
-      <span className="text-xs text-[#AAA2B7] font-medium tracking-wide animate-pulse">Loading ANIFLEX...</span>
+      <span className="text-xs text-[#AAA2B7] font-medium tracking-wide animate-pulse">Loading OmniFlex...</span>
     </div>
   );
 }
