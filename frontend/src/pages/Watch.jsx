@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
-import VideoPlayer from '../components/VideoPlayer';
 import AnimeRow from '../components/AnimeRow';
 import { getAnimeDetails, FALLBACK_HERO } from '../services/anilistService';
 import { getMovieDetails, getTVDetails, getTVSeason, getTMDBImageUrl } from '../services/tmdbService';
@@ -25,7 +24,7 @@ export default function Watch() {
   const [isSaved, setIsSaved] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [activeServer, setActiveServer] = useState('Sub (JP)');
-  const [streamServer, setStreamServer] = useState('server1'); // 'server1' (HD Stream) | 'server2' (Backup Node) | 'hls' (Custom HLS)
+  const [streamServer, setStreamServer] = useState('server1'); // 'server1' (HD Stream) | 'server2' (Backup Node)
   const [likes, setLikes] = useState(6640);
   const [dislikes, setDislikes] = useState(127);
   const [userReaction, setUserReaction] = useState(null);
@@ -554,15 +553,6 @@ export default function Watch() {
                 >
                   Server 2 (Backup Node)
                 </button>
-                <button
-                  onClick={() => setStreamServer('hls')}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'hls'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
-                    }`}
-                >
-                  Server 3 (HLS Test)
-                </button>
               </div>
 
               {/* Audio Language Switcher */}
@@ -585,32 +575,18 @@ export default function Watch() {
           </div>
 
           {/* Video Player Display */}
-          {streamServer === 'hls' ? (
-            <VideoPlayer
-              src="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-              poster={currentEpData.thumbnail || anime?.bannerImage || anime?.coverImage?.extraLarge}
-              title={`${animeTitle} — E${currentEpData.number}`}
-              episodeTitle={currentEpData.title}
-              animeId={id}
-              episodeNum={currentEpData.number}
-              hasNext={Boolean(nextEpData)}
-              hasPrev={Boolean(prevEpData)}
-              onNextEpisode={() => nextEpData && handleSelectEpisode(nextEpData.number)}
-              onPrevEpisode={() => prevEpData && handleSelectEpisode(prevEpData.number)}
-            />
-          ) : mediaType === 'movie' ? (
+          {mediaType === 'movie' ? (
             <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
               <iframe
                 key={`movie-${id}-${streamServer}`}
                 src={
                   streamServer === 'server2'
                     ? `https://vidsrc.to/embed/movie/${id}`
-                    : `https://vidlink.pro/movie/${id}`
+                    : `https://vidsrc.me/embed/movie?tmdb=${id}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
                 referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} - Full Movie`}
               />
@@ -622,12 +598,11 @@ export default function Watch() {
                 src={
                   streamServer === 'server2'
                     ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                    : `https://vidlink.pro/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                    : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${tvSeasonNum}&episode=${currentEpisodeNum}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
                 referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} Season ${tvSeasonNum} Episode ${currentEpisodeNum}`}
               />
@@ -640,7 +615,6 @@ export default function Watch() {
                 className="w-full h-full border-0"
                 allowFullScreen
                 referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${animeTitle} Episode ${currentEpData.number}`}
               />
