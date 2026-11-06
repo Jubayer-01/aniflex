@@ -28,11 +28,11 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
   const currentAnime = trendingList[activeIdx] || trendingList[0] || anime;
   if (!currentAnime) return null;
 
-  const title = currentAnime.title?.english || currentAnime.title?.romaji || 'Demon Slayer: Kimetsu no Yaiba';
+  const title = currentAnime.title?.english || currentAnime.title?.romaji || currentAnime.title || currentAnime.name || '';
   const subtitle = currentAnime.title?.romaji && currentAnime.title?.english ? currentAnime.title.romaji : null;
-  const banner = currentAnime.bannerImage || currentAnime.coverImage?.extraLarge || 'https://images.alphacoders.com/131/1314905.jpeg';
-  const score = currentAnime.score || (currentAnime.averageScore ? (currentAnime.averageScore / 10).toFixed(1) : '9.2');
-  const year = currentAnime.year || currentAnime.seasonYear || '2024';
+  const banner = currentAnime.bannerImage || currentAnime.coverImage?.extraLarge || '';
+  const score = currentAnime.score || (currentAnime.averageScore ? (currentAnime.averageScore / 10).toFixed(1) : '');
+  const year = currentAnime.year || currentAnime.seasonYear || '';
   const format = currentAnime.format
     ? currentAnime.format.replace('_', ' ')
     : currentAnime.media_type === 'movie'
@@ -41,8 +41,7 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
     ? 'TV Series'
     : 'Anime';
   const rating = currentAnime.rating || 'PG-13';
-  const description = (currentAnime.description || '').replace(/<[^>]*>?/gm, '') ||
-    'A family is attacked by demons and only two members survive - Tanjiro and his sister Nezuko, who is turned into a demon slowly. Tanjiro sets out to become a demon slayer to avenge his family and cure his sister.';
+  const description = (currentAnime.description || currentAnime.overview || '').replace(/<[^>]*>?/gm, '');
 
   const handlePrev = () => {
     setActiveIdx((prev) => (prev - 1 + trendingList.length) % trendingList.length);

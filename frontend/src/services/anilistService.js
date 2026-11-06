@@ -23,94 +23,6 @@ async function fetchGraphQL(query, variables = {}) {
   }
 }
 
-// Reliable fallback data using official AniList CDN images (never 403 or broken)
-export const FALLBACK_HERO = {
-  id: 101922,
-  title: {
-    english: "Demon Slayer: Kimetsu no Yaiba",
-    romaji: "Kimetsu no Yaiba",
-  },
-  bannerImage: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-YfZhKXRfkWtd.jpg",
-  coverImage: {
-    extraLarge: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgLd.jpg",
-    large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgLd.jpg",
-  },
-  year: 2023,
-  seasons: 4,
-  rating: "PG-13",
-  score: 9.2,
-  description: "A family is attacked by demons and only two members survive - Tanjiro and his sister Nezuko, who is turned into a demon slowly. Tanjiro sets out to become a demon slayer to avenge his family and cure his sister.",
-  genres: ["Action", "Fantasy", "Supernatural"],
-};
-
-// Curated solid fallback dataset for all shelves if user is offline or rate limited
-export const FALLBACK_CATALOG = [
-  {
-    id: 101922,
-    title: { english: "Demon Slayer: Kimetsu no Yaiba", romaji: "Kimetsu no Yaiba" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgLd.jpg" },
-    seasonYear: 2019,
-    averageScore: 92,
-    genres: ["Action", "Fantasy"]
-  },
-  {
-    id: 113415,
-    title: { english: "Jujutsu Kaisen", romaji: "Jujutsu Kaisen" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-bbBWj4pEFseh.jpg" },
-    seasonYear: 2020,
-    averageScore: 87,
-    genres: ["Action", "Supernatural"]
-  },
-  {
-    id: 16498,
-    title: { english: "Attack on Titan", romaji: "Shingeki no Kyojin" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-C6FPmWm59CyP.jpg" },
-    seasonYear: 2013,
-    averageScore: 90,
-    genres: ["Action", "Drama"]
-  },
-  {
-    id: 151807,
-    title: { english: "Solo Leveling", romaji: "Ore dake Level Up na Ken" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx151807-3FL2e5L15f5F.jpg" },
-    seasonYear: 2024,
-    averageScore: 86,
-    genres: ["Action", "Fantasy"]
-  },
-  {
-    id: 21,
-    title: { english: "One Piece", romaji: "ONE PIECE" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-6D5twZcrrq48.jpg" },
-    seasonYear: 1999,
-    averageScore: 89,
-    genres: ["Action", "Adventure"]
-  },
-  {
-    id: 140960,
-    title: { english: "Spy x Family", romaji: "SPY×FAMILY" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx140960-YrkHG4UnDQfH.jpg" },
-    seasonYear: 2022,
-    averageScore: 85,
-    genres: ["Comedy", "Action"]
-  },
-  {
-    id: 127230,
-    title: { english: "Chainsaw Man", romaji: "Chainsaw Man" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-NuEagrfSR9eL.png" },
-    seasonYear: 2022,
-    averageScore: 85,
-    genres: ["Action", "Supernatural"]
-  },
-  {
-    id: 20464,
-    title: { english: "Haikyu!!", romaji: "Haikyuu!!" },
-    coverImage: { large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-eW7fqm18D2F8.jpg" },
-    seasonYear: 2014,
-    averageScore: 88,
-    genres: ["Sports", "Drama"]
-  }
-];
-
 const ANIME_MEDIA_FRAGMENT = `
   id
   title {
@@ -188,12 +100,12 @@ export async function getHomePageCatalog(force = false) {
 
   if (result) {
     const catalogData = {
-      trending: result.trending?.media || FALLBACK_CATALOG,
-      popular: result.popular?.media || FALLBACK_CATALOG,
-      action: result.action?.media || FALLBACK_CATALOG,
-      romance: result.romance?.media || FALLBACK_CATALOG,
-      movies: result.movies?.media || FALLBACK_CATALOG,
-      recent: result.recent?.media || FALLBACK_CATALOG,
+      trending: result.trending?.media || [],
+      popular: result.popular?.media || [],
+      action: result.action?.media || [],
+      romance: result.romance?.media || [],
+      movies: result.movies?.media || [],
+      recent: result.recent?.media || [],
     };
 
     // Register all home catalog anime into master search index
@@ -210,7 +122,7 @@ export async function getHomePageCatalog(force = false) {
     return catalogData;
   }
 
-  // 3. Fallback: If network failed or 429 rate limit hit, check expired cache or return solid fallbacks
+  // 3. Fallback: If network failed or 429 rate limit hit, check expired cache
   try {
     const cached = localStorage.getItem(HOME_CACHE_KEY);
     if (cached) {
@@ -220,23 +132,18 @@ export async function getHomePageCatalog(force = false) {
   } catch (e) {}
 
   return {
-    trending: FALLBACK_CATALOG,
-    popular: FALLBACK_CATALOG,
-    action: FALLBACK_CATALOG,
-    romance: FALLBACK_CATALOG,
-    movies: FALLBACK_CATALOG,
-    recent: FALLBACK_CATALOG,
+    trending: [],
+    popular: [],
+    action: [],
+    romance: [],
+    movies: [],
+    recent: [],
   };
 }
 
 // In-memory search cache and master anime index for instant alphabet matching
 const searchCache = new Map();
 let masterAnimeIndex = new Map();
-
-// Seed master index with fallbacks
-FALLBACK_CATALOG.forEach((item) => {
-  if (item && item.id) masterAnimeIndex.set(item.id, item);
-});
 
 export function registerAnimeToIndex(animeList) {
   if (!Array.isArray(animeList)) return;
@@ -436,7 +343,7 @@ export async function searchAnime(
   }
 
   // Only return fallback catalog if user is browsing general catalog without query
-  return page === 1 && !cleanGenre && !cleanFormat && !cleanStatus ? FALLBACK_CATALOG : [];
+  return [];
 }
 
 export async function getAnimeDetails(id) {

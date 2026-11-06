@@ -4,8 +4,7 @@ import Hero from '../components/Hero';
 import ContinueWatchingRow from '../components/ContinueWatchingRow';
 import AnimeRow from '../components/AnimeRow';
 import {
-  getHomePageCatalog,
-  FALLBACK_HERO
+  getHomePageCatalog
 } from '../services/anilistService';
 import { getWatchHistory } from '../services/watchHistoryService';
 import { useNavigate } from 'react-router-dom';
@@ -50,7 +49,7 @@ function FadeInRow({ children, className = '' }) {
 
 export default function Anime() {
   const navigate = useNavigate();
-  const [heroAnime, setHeroAnime] = useState(FALLBACK_HERO);
+  const [heroAnime, setHeroAnime] = useState(null);
   const [continueWatching, setContinueWatching] = useState(() => getWatchHistory());
   const [catalog, setCatalog] = useState({
     trending: [],
@@ -133,11 +132,13 @@ export default function Anime() {
   return (
     <div className="relative min-h-screen bg-[#060709] text-white overflow-x-hidden">
       {/* Hero Spotlight Section: Top 6 Side-by-Side Trending Anime with 7s Loop */}
-      <Hero
-        anime={heroAnime}
-        items={catalog.trending && catalog.trending.length > 0 ? catalog.trending.slice(0, 6) : [heroAnime]}
-        onOpenDetails={(anime) => handlePlayAnime(anime)}
-      />
+      {heroAnime && (
+        <Hero
+          anime={heroAnime}
+          items={catalog.trending && catalog.trending.length > 0 ? catalog.trending.slice(0, 6) : [heroAnime]}
+          onOpenDetails={(anime) => handlePlayAnime(anime)}
+        />
+      )}
 
       {/* Main Content Shelves */}
       <div className="relative z-20 -mt-16 space-y-3 pb-12">

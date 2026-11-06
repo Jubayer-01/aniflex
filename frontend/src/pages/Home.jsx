@@ -4,7 +4,7 @@ import { ArrowRight, Film, Tv, Play, Sparkles, Clapperboard, Star } from 'lucide
 import Hero from '../components/Hero';
 import ContinueWatchingRow from '../components/ContinueWatchingRow';
 import AnimeRow from '../components/AnimeRow';
-import { getHomePageCatalog, FALLBACK_HERO } from '../services/anilistService';
+import { getHomePageCatalog } from '../services/anilistService';
 import {
   getTrendingAll,
   getHollywoodMovies,
@@ -55,7 +55,7 @@ function FadeInRow({ children, className = '' }) {
 export default function Home() {
   const navigate = useNavigate();
   const [continueWatching, setContinueWatching] = useState(() => getWatchHistory());
-  const [heroItems, setHeroItems] = useState([FALLBACK_HERO]);
+  const [heroItems, setHeroItems] = useState([]);
   const [trendingAll, setTrendingAll] = useState([]);
   const [hollywoodMovies, setHollywoodMovies] = useState([]);
   const [bollywoodMovies, setBollywoodMovies] = useState([]);
@@ -142,11 +142,13 @@ export default function Home() {
   return (
     <div className="relative min-h-screen bg-[#060709] text-white overflow-x-hidden font-sans">
       {/* 1. Master Omni Hero Spotlight */}
-      <Hero
-        anime={heroItems[0]}
-        items={heroItems}
-        onOpenDetails={handlePlayMedia}
-      />
+      {heroItems.length > 0 && (
+        <Hero
+          anime={heroItems[0]}
+          items={heroItems}
+          onOpenDetails={handlePlayMedia}
+        />
+      )}
 
       {/* 2. Main Entertainment Shelves */}
       <div className="relative z-20 pt-6 space-y-3 pb-16">

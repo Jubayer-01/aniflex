@@ -6,7 +6,6 @@ import {
   getHollywoodMovies,
   getBollywoodMovies,
   getTMDBImageUrl,
-  FALLBACK_MOVIES,
 } from '../services/tmdbService';
 
 const MOVIE_CATEGORIES = [
@@ -52,7 +51,7 @@ export default function Movies() {
         const allHollywood = [...hw1, ...hw2, ...hw3];
         const allBollywood = [...bw1, ...bw2, ...bw3];
 
-        setHollywoodList(allHollywood.length > 0 ? allHollywood : FALLBACK_MOVIES);
+        setHollywoodList(allHollywood);
         setBollywoodList(allBollywood);
         setPage(3);
       } catch (err) {
@@ -140,7 +139,7 @@ export default function Movies() {
 
   // Featured Hero Movie
   const heroMovie = useMemo(() => {
-    return hollywoodList[0] || bollywoodList[0] || FALLBACK_MOVIES[0];
+    return hollywoodList[0] || bollywoodList[0] || null;
   }, [hollywoodList, bollywoodList]);
 
   // Displayed items based on active tab

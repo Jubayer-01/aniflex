@@ -5,8 +5,7 @@ import AnimeCard from '../components/AnimeCard';
 import {
   instantAlphabetSearch,
   getLocalCatalogMatches,
-  getHomePageCatalog,
-  FALLBACK_CATALOG
+  getHomePageCatalog
 } from '../services/anilistService';
 import { searchTMDB } from '../services/tmdbService';
 
@@ -43,7 +42,7 @@ export default function Search() {
       if (data?.trending) {
         setTrendingAnime(data.trending.slice(0, 18));
       } else {
-        setTrendingAnime(FALLBACK_CATALOG);
+        setTrendingAnime([]);
       }
     });
   }, []);
