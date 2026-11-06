@@ -46,8 +46,8 @@ export default function Movies() {
         ]);
 
         if (!isMounted) return;
-        const allHollywood = [...hw1, ...hw2];
-        const allBollywood = [...bw1, ...bw2];
+        const allHollywood = [...(hw1 || []), ...(hw2 || [])];
+        const allBollywood = [...(bw1 || []), ...(bw2 || [])];
 
         setHollywoodList(allHollywood);
         setBollywoodList(allBollywood);

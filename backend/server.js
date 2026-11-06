@@ -36,14 +36,16 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   'https://aniflex-beta.vercel.app',
   'https://aniflex.vercel.app',
+  'https://omniflex-beta.vercel.app',
+  'https://omniflex.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser requests (tools, curl) with no origin header
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow non-browser requests (tools, curl) with no origin header, or any Vercel deployment
+    if (!origin || allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
       return callback(null, true);
     }
     // Reject untrusted origins cleanly without throwing a 500 error

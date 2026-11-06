@@ -45,8 +45,8 @@ export default function Series() {
         ]);
 
         if (!isMounted) return;
-        const allSeries = [...s1, ...s2];
-        const allKdramas = [...k1, ...k2];
+        const allSeries = [...(s1 || []), ...(s2 || [])];
+        const allKdramas = [...(k1 || []), ...(k2 || [])];
 
         setSeriesList(allSeries);
         setKdramaList(allKdramas);
