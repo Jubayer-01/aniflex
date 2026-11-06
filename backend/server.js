@@ -14,6 +14,11 @@ import movieRoutes from './routes/movies.js';
 
 dotenv.config();
 
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: process.env.JWT_SECRET is missing. Server will not start without a secure secret.');
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -41,13 +46,25 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(new Error(`CORS blocked: Origin ${origin} not permitted.`));
+    // Reject untrusted origins cleanly without throwing a 500 error
+    return callback(null, false);
   },
   credentials: true,
 }));
 
-// 3. Body Parsing
-app.use(express.json());
+// 3. Body Parsing with safe size limit
+app.use(express.json({ limit: '50kb' }));
+
+// Middleware to catch malformed JSON and payload-too-large errors with 400/413 instead of 500
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Malformed JSON payload' });
+  }
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Payload too large. Maximum size is 50KB.' });
+  }
+  next(err);
+});
 
 // 4. General API Rate Limiter (Max 300 requests per 15 mins per IP across all endpoints)
 const generalApiLimiter = rateLimit({

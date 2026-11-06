@@ -38,8 +38,11 @@ export async function initDatabase() {
       username VARCHAR(50) NOT NULL UNIQUE,
       email VARCHAR(100) NOT NULL UNIQUE,
       password_hash VARCHAR(255) NOT NULL,
-      avatar_url VARCHAR(255) DEFAULT NULL,
+      avatar_url VARCHAR(500) DEFAULT NULL,
       role ENUM('user', 'admin') DEFAULT 'user',
+      reset_token_hash VARCHAR(255) DEFAULT NULL,
+      reset_token_expires_at DATETIME DEFAULT NULL,
+      token_version INT DEFAULT 1,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;`,
@@ -103,25 +106,30 @@ export async function initDatabase() {
     `CREATE TABLE IF NOT EXISTS watchlist (
       id INT AUTO_INCREMENT PRIMARY KEY,
       user_id INT NOT NULL,
-      anime_id INT NOT NULL,
+      anime_id VARCHAR(64) NOT NULL,
+      media_type VARCHAR(20) DEFAULT 'movie',
       status ENUM('plan_to_watch', 'watching', 'completed', 'dropped') DEFAULT 'watching',
+      title VARCHAR(255) DEFAULT '',
+      poster_url VARCHAR(500) DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY (anime_id) REFERENCES anime(id) ON DELETE CASCADE,
       UNIQUE KEY unique_user_anime (user_id, anime_id)
     ) ENGINE=InnoDB;`,
 
     `CREATE TABLE IF NOT EXISTS watch_history (
       id INT AUTO_INCREMENT PRIMARY KEY,
       user_id INT NOT NULL,
-      episode_id INT NOT NULL,
+      media_id VARCHAR(64) NOT NULL,
+      media_type VARCHAR(20) DEFAULT 'movie',
+      episode_number INT DEFAULT 1,
+      title VARCHAR(255) DEFAULT '',
+      thumbnail_url VARCHAR(500) DEFAULT NULL,
       progress_seconds INT DEFAULT 0,
       duration_seconds INT DEFAULT 0,
       is_completed BOOLEAN DEFAULT FALSE,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY (episode_id) REFERENCES episodes(id) ON DELETE CASCADE,
-      UNIQUE KEY unique_user_episode (user_id, episode_id)
+      UNIQUE KEY unique_user_media (user_id, media_id, episode_number)
     ) ENGINE=InnoDB;`,
 
     `CREATE TABLE IF NOT EXISTS reviews (
@@ -162,6 +170,33 @@ export async function initDatabase() {
     for (const sql of tables) {
       await connection.query(sql);
     }
+
+    // Safe column migrations for existing databases
+    const migrations = [
+      'ALTER TABLE users ADD COLUMN reset_token_hash VARCHAR(255) DEFAULT NULL',
+      'ALTER TABLE users ADD COLUMN reset_token_expires_at DATETIME DEFAULT NULL',
+      'ALTER TABLE users ADD COLUMN token_version INT DEFAULT 1',
+      'ALTER TABLE users MODIFY COLUMN avatar_url VARCHAR(500) DEFAULT NULL',
+      'ALTER TABLE watchlist DROP FOREIGN KEY watchlist_ibfk_2',
+      'ALTER TABLE watchlist MODIFY COLUMN anime_id VARCHAR(64) NOT NULL',
+      'ALTER TABLE watchlist ADD COLUMN media_type VARCHAR(20) DEFAULT "movie"',
+      'ALTER TABLE watchlist ADD COLUMN title VARCHAR(255) DEFAULT ""',
+      'ALTER TABLE watchlist ADD COLUMN poster_url VARCHAR(500) DEFAULT NULL',
+      'ALTER TABLE watch_history DROP FOREIGN KEY watch_history_ibfk_2',
+      'ALTER TABLE watch_history ADD COLUMN media_id VARCHAR(64) NOT NULL DEFAULT ""',
+      'ALTER TABLE watch_history ADD COLUMN media_type VARCHAR(20) DEFAULT "movie"',
+      'ALTER TABLE watch_history ADD COLUMN episode_number INT DEFAULT 1',
+      'ALTER TABLE watch_history ADD COLUMN title VARCHAR(255) DEFAULT ""',
+      'ALTER TABLE watch_history ADD COLUMN thumbnail_url VARCHAR(500) DEFAULT NULL',
+    ];
+    for (const mig of migrations) {
+      try {
+        await connection.query(mig);
+      } catch (e) {
+        // Ignored: already migrated or constraint already updated
+      }
+    }
+
     console.log('Database tables & default seed verified successfully');
     connection.release();
   } catch (error) {

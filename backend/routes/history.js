@@ -7,22 +7,28 @@ const router = express.Router();
 // All history routes require authentication
 router.use(authenticateToken);
 
-// GET /api/history (Get user's continue-watching history)
+// GET /api/history (Get user's continue-watching history - decoupled from local tables)
 router.get('/', async (req, res) => {
+  const { limit = 20 } = req.query;
+
+  if (req.query.limit !== undefined) {
+    if (!/^\d+$/.test(String(limit)) || Number(limit) < 1 || Number(limit) > 100) {
+      return res.status(400).json({ error: 'Invalid limit parameter. Must be an integer between 1 and 100' });
+    }
+  }
+
+  const safeLimit = Math.min(Math.max(1, Number(limit) || 20), 50);
+
   try {
     const [history] = await pool.query(
-      `SELECT h.id AS history_id, h.progress_seconds, h.duration_seconds, h.is_completed, h.updated_at,
-              ROUND((h.progress_seconds / NULLIF(h.duration_seconds, 0)) * 100) AS progress_percent,
-              e.id AS episode_id, e.episode_number, e.title AS episode_title, e.thumbnail_url,
-              a.id AS anime_id, a.title_english, a.title_romaji, a.banner_url
-       FROM watch_history h
-       JOIN episodes e ON h.episode_id = e.id
-       JOIN seasons s ON e.season_id = s.id
-       JOIN anime a ON s.anime_id = a.id
-       WHERE h.user_id = ?
-       ORDER BY h.updated_at DESC
-       LIMIT 20`,
-      [req.user.id]
+      `SELECT id AS history_id, media_id, media_type, episode_number, title, thumbnail_url,
+              progress_seconds, duration_seconds, is_completed, updated_at,
+              ROUND((progress_seconds / NULLIF(duration_seconds, 0)) * 100) AS progress_percent
+       FROM watch_history
+       WHERE user_id = ?
+       ORDER BY updated_at DESC
+       LIMIT ?`,
+      [req.user.id, safeLimit]
     );
 
     res.json({ history });
@@ -34,22 +40,52 @@ router.get('/', async (req, res) => {
 
 // POST /api/history (Record playback heartbeat / save progress)
 router.post('/', async (req, res) => {
-  const { episodeId, progressSeconds = 0, durationSeconds = 0, isCompleted = false } = req.body;
+  const {
+    mediaId,
+    episodeId,
+    mediaType = 'movie',
+    episodeNumber = 1,
+    title = '',
+    thumbnailUrl = '',
+    progressSeconds = 0,
+    durationSeconds = 0,
+    isCompleted = false
+  } = req.body;
 
-  if (!episodeId) {
-    return res.status(400).json({ error: 'episodeId is required' });
+  const targetId = String(mediaId || episodeId || '').trim();
+  if (!targetId || targetId.length > 64) {
+    return res.status(400).json({ error: 'Valid mediaId or episodeId is required' });
   }
+
+  const cleanMediaType = String(mediaType || 'movie').slice(0, 20);
+  const cleanEpisodeNum = Math.max(1, Number(episodeNumber) || 1);
+  const cleanTitle = String(title || '').slice(0, 255);
+  const cleanThumbnail = String(thumbnailUrl || '').slice(0, 500);
+  const cleanProgress = Math.max(0, Number(progressSeconds) || 0);
+  const cleanDuration = Math.max(0, Number(durationSeconds) || 0);
 
   try {
     await pool.query(
-      `INSERT INTO watch_history (user_id, episode_id, progress_seconds, duration_seconds, is_completed)
-       VALUES (?, ?, ?, ?, ?)
+      `INSERT INTO watch_history (user_id, media_id, media_type, episode_number, title, thumbnail_url, progress_seconds, duration_seconds, is_completed)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          progress_seconds = VALUES(progress_seconds),
          duration_seconds = VALUES(duration_seconds),
          is_completed = VALUES(is_completed),
+         title = CASE WHEN VALUES(title) != '' THEN VALUES(title) ELSE title END,
+         thumbnail_url = CASE WHEN VALUES(thumbnail_url) != '' THEN VALUES(thumbnail_url) ELSE thumbnail_url END,
          updated_at = CURRENT_TIMESTAMP`,
-      [req.user.id, episodeId, Math.floor(progressSeconds), Math.floor(durationSeconds), Boolean(isCompleted)]
+      [
+        req.user.id,
+        targetId,
+        cleanMediaType,
+        cleanEpisodeNum,
+        cleanTitle,
+        cleanThumbnail,
+        Math.floor(cleanProgress),
+        Math.floor(cleanDuration),
+        Boolean(isCompleted)
+      ]
     );
 
     res.status(200).json({ message: 'Watch progress saved successfully' });
@@ -60,4 +96,3 @@ router.post('/', async (req, res) => {
 });
 
 export default router;
-

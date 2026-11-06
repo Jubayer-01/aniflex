@@ -7,6 +7,19 @@ const router = express.Router();
 // GET /api/anime (Browse & filter catalog)
 router.get('/', async (req, res) => {
   const { genre, sort = 'score', search, limit = 24, page = 1 } = req.query;
+
+  if (req.query.limit !== undefined) {
+    if (!/^\d+$/.test(String(limit)) || Number(limit) < 1 || Number(limit) > 100) {
+      return res.status(400).json({ error: 'Invalid limit parameter. Must be an integer between 1 and 100' });
+    }
+  }
+
+  if (req.query.page !== undefined) {
+    if (!/^\d+$/.test(String(page)) || Number(page) < 1) {
+      return res.status(400).json({ error: 'Invalid page parameter. Must be a positive integer' });
+    }
+  }
+
   const safeLimit = Math.min(Math.max(1, Number(limit) || 24), 50);
   const safePage = Math.max(1, Number(page) || 1);
   const offset = (safePage - 1) * safeLimit;

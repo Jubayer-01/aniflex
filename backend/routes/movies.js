@@ -4,7 +4,7 @@ import axios from 'axios';
 const router = express.Router();
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 if (!TMDB_API_KEY) {
-  console.warn('[SECURITY] process.env.TMDB_API_KEY is not configured. TMDB requests will be rejected.');
+  console.warn('[SECURITY] process.env.TMDB_API_KEY is not configured. TMDB requests will return 503.');
 }
 const BASE_URL = 'https://api.themoviedb.org/3';
 
@@ -32,9 +32,19 @@ function setCached(key, data) {
 // Validation helper for numeric parameters
 const isValidNumericId = (val) => /^\d+$/.test(String(val));
 
-// Reusable TMDB fetcher
+function validatePage(req, res) {
+  if (req.query.page !== undefined) {
+    if (!/^\d+$/.test(String(req.query.page)) || Number(req.query.page) < 1) {
+      res.status(400).json({ error: 'Invalid page parameter. Must be a positive integer' });
+      return false;
+    }
+  }
+  return true;
+}
+
+// Reusable TMDB fetcher returning explicit error states
 async function fetchTMDB(endpoint, params = {}) {
-  if (!TMDB_API_KEY) return null;
+  if (!TMDB_API_KEY) return { error: 'TMDB_KEY_MISSING' };
 
   const cacheKey = `${endpoint}_${JSON.stringify(params)}`;
   const hit = getCached(cacheKey);
@@ -56,18 +66,46 @@ async function fetchTMDB(endpoint, params = {}) {
     return response.data;
   } catch (error) {
     console.error(`TMDB Server proxy error [${endpoint}]:`, error.message);
-    return null;
+    if (error.response?.status === 404) return null;
+    return { error: 'UPSTREAM_ERROR' };
   }
+}
+
+function sendTMDBResults(res, data) {
+  if (data?.error === 'TMDB_KEY_MISSING') {
+    return res.status(503).json({ error: 'TMDB service key not configured on server' });
+  }
+  if (data?.error === 'UPSTREAM_ERROR') {
+    return res.status(502).json({ error: 'Upstream TMDB service temporarily unreachable' });
+  }
+  if (!data) {
+    return res.status(502).json({ error: 'Upstream TMDB service unreachable' });
+  }
+  return res.json({ results: data.results || [] });
+}
+
+function sendTMDBDetail(res, data, notFoundMsg = 'Resource not found') {
+  if (data?.error === 'TMDB_KEY_MISSING') {
+    return res.status(503).json({ error: 'TMDB service key not configured on server' });
+  }
+  if (data?.error === 'UPSTREAM_ERROR') {
+    return res.status(502).json({ error: 'Upstream TMDB service temporarily unreachable' });
+  }
+  if (!data) {
+    return res.status(404).json({ error: notFoundMsg });
+  }
+  return res.json(data);
 }
 
 // 1. GET /api/movies/trending
 router.get('/trending', async (req, res) => {
   const data = await fetchTMDB('/trending/all/day');
-  res.json({ results: data?.results || [] });
+  sendTMDBResults(res, data);
 });
 
 // 2. GET /api/movies/hollywood
 router.get('/hollywood', async (req, res) => {
+  if (!validatePage(req, res)) return;
   const { page = 1, genre } = req.query;
   const safePage = Math.min(Math.max(1, Number(page) || 1), 100);
   const params = {
@@ -78,11 +116,12 @@ router.get('/hollywood', async (req, res) => {
   if (genre && isValidNumericId(genre)) params.with_genres = genre;
 
   const data = await fetchTMDB('/discover/movie', params);
-  res.json({ results: data?.results || [] });
+  sendTMDBResults(res, data);
 });
 
 // 3. GET /api/movies/bollywood
 router.get('/bollywood', async (req, res) => {
+  if (!validatePage(req, res)) return;
   const { page = 1 } = req.query;
   const safePage = Math.min(Math.max(1, Number(page) || 1), 100);
   const data = await fetchTMDB('/discover/movie', {
@@ -90,11 +129,12 @@ router.get('/bollywood', async (req, res) => {
     with_original_language: 'hi',
     sort_by: 'popularity.desc',
   });
-  res.json({ results: data?.results || [] });
+  sendTMDBResults(res, data);
 });
 
 // 4. GET /api/movies/series
 router.get('/series', async (req, res) => {
+  if (!validatePage(req, res)) return;
   const { page = 1, genre } = req.query;
   const safePage = Math.min(Math.max(1, Number(page) || 1), 100);
   const params = {
@@ -104,11 +144,12 @@ router.get('/series', async (req, res) => {
   if (genre && isValidNumericId(genre)) params.with_genres = genre;
 
   const data = await fetchTMDB('/discover/tv', params);
-  res.json({ results: data?.results || [] });
+  sendTMDBResults(res, data);
 });
 
 // 5. GET /api/movies/kdramas
 router.get('/kdramas', async (req, res) => {
+  if (!validatePage(req, res)) return;
   const { page = 1 } = req.query;
   const safePage = Math.min(Math.max(1, Number(page) || 1), 100);
   const data = await fetchTMDB('/discover/tv', {
@@ -116,7 +157,7 @@ router.get('/kdramas', async (req, res) => {
     with_original_language: 'ko',
     sort_by: 'popularity.desc',
   });
-  res.json({ results: data?.results || [] });
+  sendTMDBResults(res, data);
 });
 
 // 6. GET /api/movies/details/:id
@@ -127,8 +168,7 @@ router.get('/details/:id', async (req, res) => {
   const data = await fetchTMDB(`/movie/${id}`, {
     append_to_response: 'videos,credits,recommendations',
   });
-  if (!data) return res.status(404).json({ error: 'Movie not found' });
-  res.json(data);
+  sendTMDBDetail(res, data, 'Movie not found');
 });
 
 // 7. GET /api/movies/tv/details/:id
@@ -139,8 +179,7 @@ router.get('/tv/details/:id', async (req, res) => {
   const data = await fetchTMDB(`/tv/${id}`, {
     append_to_response: 'videos,credits,recommendations',
   });
-  if (!data) return res.status(404).json({ error: 'TV Series not found' });
-  res.json(data);
+  sendTMDBDetail(res, data, 'TV Series not found');
 });
 
 // 8. GET /api/movies/tv/:id/season/:seasonNumber
@@ -151,20 +190,19 @@ router.get('/tv/:id/season/:seasonNumber', async (req, res) => {
   }
 
   const data = await fetchTMDB(`/tv/${id}/season/${seasonNumber}`);
-  if (!data) return res.status(404).json({ error: 'Season not found' });
-  res.json(data);
+  sendTMDBDetail(res, data, 'Season not found');
 });
 
 // 9. GET /api/movies/search
 router.get('/search', async (req, res) => {
+  if (!validatePage(req, res)) return;
   const { query, page = 1 } = req.query;
   const clean = String(query || '').trim().slice(0, 100);
   if (!clean) return res.json({ results: [] });
 
   const safePage = Math.min(Math.max(1, Number(page) || 1), 50);
   const data = await fetchTMDB('/search/multi', { query: clean, page: safePage });
-  res.json({ results: data?.results || [] });
+  sendTMDBResults(res, data);
 });
 
 export default router;
-

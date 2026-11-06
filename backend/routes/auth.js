@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import { pool } from '../config/db.js';
 import { authenticateToken } from '../middleware/auth.js';
@@ -12,6 +13,9 @@ if (!JWT_SECRET) {
   throw new Error('CRITICAL SECURITY ERROR: process.env.JWT_SECRET is missing. Server cannot start without a secure secret.');
 }
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+
+// Pre-computed dummy hash to equalize login response time (~85ms) and prevent email enumeration
+const DUMMY_HASH = '$2a$10$wT8PZ1pL0u7Xb7xZ7j1zNuqW6Y.O6D1D5V0a2U4k5m6n7o8p9q0r.';
 
 // Anti-brute force limiter: Max 10 attempts per 15 minutes per IP
 const authLimiter = rateLimit({
@@ -74,15 +78,15 @@ router.post('/register', authLimiter, async (req, res) => {
 
     // Insert new user
     const [result] = await pool.query(
-      'INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, "user")',
+      'INSERT INTO users (username, email, password_hash, role, token_version) VALUES (?, ?, ?, "user", 1)',
       [cleanUsername, cleanEmail, passwordHash]
     );
 
     const userId = result.insertId;
 
-    // Generate JWT token
+    // Generate JWT token with token_version for session tracking
     const token = jwt.sign(
-      { id: userId, username: cleanUsername, email: cleanEmail, role: 'user' },
+      { id: userId, username: cleanUsername, email: cleanEmail, role: 'user', token_version: 1 },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     );
@@ -102,17 +106,21 @@ router.post('/register', authLimiter, async (req, res) => {
 router.post('/login', authLimiter, async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (!email || !password || typeof password !== 'string') {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
+  const cleanEmail = String(email).trim().toLowerCase();
+
   try {
     const [rows] = await pool.query(
-      'SELECT id, username, email, password_hash, role, avatar_url FROM users WHERE email = ? LIMIT 1',
-      [email]
+      'SELECT id, username, email, password_hash, role, avatar_url, token_version FROM users WHERE email = ? LIMIT 1',
+      [cleanEmail]
     );
 
+    // Mitigate timing attack & email enumeration: execute dummy bcrypt comparison when email not found
     if (rows.length === 0) {
+      await bcrypt.compare(password, DUMMY_HASH);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
@@ -124,9 +132,11 @@ router.post('/login', authLimiter, async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    const currentVersion = user.token_version || 1;
+
     // Generate JWT token
     const token = jwt.sign(
-      { id: user.id, username: user.username, email: user.email, role: user.role },
+      { id: user.id, username: user.username, email: user.email, role: user.role, token_version: currentVersion },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     );
@@ -167,14 +177,35 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
-// PUT /api/auth/profile (Update username or avatar)
+// PUT /api/auth/profile (Update username or avatar with strict input checks)
 router.put('/profile', authenticateToken, async (req, res) => {
   const { username, avatar_url } = req.body;
+
+  let cleanUsername = null;
+  if (username !== undefined) {
+    cleanUsername = String(username).trim();
+    if (cleanUsername.length < 3 || cleanUsername.length > 30 || !/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+      return res.status(400).json({ error: 'Username must be 3-30 characters (alphanumeric and underscores only)' });
+    }
+    // Check for duplicate username
+    const [dup] = await pool.query('SELECT id FROM users WHERE username = ? AND id != ? LIMIT 1', [cleanUsername, req.user.id]);
+    if (dup.length > 0) {
+      return res.status(409).json({ error: 'Username is already taken' });
+    }
+  }
+
+  let cleanAvatar = null;
+  if (avatar_url !== undefined && avatar_url !== null) {
+    cleanAvatar = String(avatar_url).trim();
+    if (cleanAvatar.length > 500) {
+      return res.status(400).json({ error: 'avatar_url must not exceed 500 characters' });
+    }
+  }
 
   try {
     await pool.query(
       'UPDATE users SET username = COALESCE(?, username), avatar_url = COALESCE(?, avatar_url) WHERE id = ?',
-      [username || null, avatar_url || null, req.user.id]
+      [cleanUsername, cleanAvatar, req.user.id]
     );
 
     const [rows] = await pool.query(
@@ -184,17 +215,20 @@ router.put('/profile', authenticateToken, async (req, res) => {
 
     res.json({ message: 'Profile updated successfully', user: rows[0] });
   } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ error: 'Username is already taken' });
+    }
     console.error('Profile update error:', error.message);
     res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 
-// PUT /api/auth/change-password (Secure password change)
+// PUT /api/auth/change-password (Secure password change + invalidate older sessions)
 router.put('/change-password', authenticateToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
-  if (!currentPassword || !newPassword || newPassword.length < 6) {
-    return res.status(400).json({ error: 'Current password and valid new password (min 6 chars) required' });
+  if (!currentPassword || !newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
+    return res.status(400).json({ error: 'Current password and valid new password (min 8 chars) required' });
   }
 
   try {
@@ -209,7 +243,8 @@ router.put('/change-password', authenticateToken, async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const newHash = await bcrypt.hash(newPassword, salt);
 
-    await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [newHash, req.user.id]);
+    // Invalidate prior sessions by incrementing token_version
+    await pool.query('UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?', [newHash, req.user.id]);
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
     console.error('Change password error:', error.message);
@@ -225,19 +260,23 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
   const cleanEmail = String(email).trim().toLowerCase();
 
   try {
-    const [rows] = await pool.query('SELECT id, email FROM users WHERE email = ? LIMIT 1', [cleanEmail]);
+    const [rows] = await pool.query('SELECT id FROM users WHERE email = ? LIMIT 1', [cleanEmail]);
     if (rows.length === 0) {
-      // Mitigate user enumeration: identical response for existing and non-existing accounts
+      // Mitigate user enumeration & timing difference
+      await bcrypt.compare('dummy', DUMMY_HASH);
       return res.json({ message: 'If your email is registered, you will receive a reset link.' });
     }
 
-    // Generate signed reset token
-    const resetToken = jwt.sign({ id: rows[0].id, type: 'reset' }, JWT_SECRET, { expiresIn: '15m' });
+    // Generate cryptographically secure random token & store SHA-256 hash in DB
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
 
-    // In production with live SMTP (Resend/Nodemailer), email the reset URL here:
-    // await sendResetEmail(cleanEmail, `https://aniflex.vercel.app/reset-password?token=${resetToken}`);
-    // NOTE: devToken and console.log are strictly deleted to prevent account takeover
+    await pool.query(
+      'UPDATE users SET reset_token_hash = ?, reset_token_expires_at = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?',
+      [tokenHash, rows[0].id]
+    );
 
+    // Token is never leaked in HTTP response or logs to prevent account takeover
     res.json({
       message: 'If your email is registered, you will receive a password reset link.',
     });
@@ -247,23 +286,35 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
   }
 });
 
-// POST /api/auth/reset-password (Apply new password with token)
+// POST /api/auth/reset-password (Apply new password with single-use token + revoke old sessions)
 router.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;
-  if (!token || !newPassword || newPassword.length < 8) {
+  if (!token || !newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
     return res.status(400).json({ error: 'Valid token and new password (min 8 chars) required' });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (decoded.type !== 'reset') {
-      return res.status(400).json({ error: 'Invalid reset token' });
+    const tokenHash = crypto.createHash('sha256').update(String(token)).digest('hex');
+
+    const [rows] = await pool.query(
+      'SELECT id FROM users WHERE reset_token_hash = ? AND reset_token_expires_at > NOW() LIMIT 1',
+      [tokenHash]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
     }
 
+    const userId = rows[0].id;
     const salt = await bcrypt.genSalt(10);
     const newHash = await bcrypt.hash(newPassword, salt);
 
-    await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [newHash, decoded.id]);
+    // Clear reset token (single-use enforcement) and bump token_version (session revocation)
+    await pool.query(
+      'UPDATE users SET password_hash = ?, reset_token_hash = NULL, reset_token_expires_at = NULL, token_version = token_version + 1 WHERE id = ?',
+      [newHash, userId]
+    );
+
     res.json({ message: 'Password has been reset successfully. You may now log in.' });
   } catch (error) {
     console.error('Reset password error:', error.message);
@@ -272,4 +323,3 @@ router.post('/reset-password', async (req, res) => {
 });
 
 export default router;
-

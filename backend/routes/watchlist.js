@@ -7,17 +7,17 @@ const router = express.Router();
 // All watchlist routes require authentication
 router.use(authenticateToken);
 
-// GET /api/watchlist (Get user's personal saved watchlist)
+const ALLOWED_STATUSES = ['watching', 'completed', 'plan_to_watch', 'dropped', 'on_hold'];
+
+// GET /api/watchlist (Get user's personal saved watchlist - decoupled from local tables)
 router.get('/', async (req, res) => {
   try {
     const [items] = await pool.query(
-      `SELECT w.id AS watchlist_id, w.status AS watch_status, w.created_at AS added_at,
-              a.id, a.anilist_id, a.title_english, a.title_romaji, a.poster_url, a.banner_url,
-              a.score, a.season_year, a.status
-       FROM watchlist w
-       JOIN anime a ON w.anime_id = a.id
-       WHERE w.user_id = ?
-       ORDER BY w.created_at DESC`,
+      `SELECT id AS watchlist_id, anime_id, media_type, status AS watch_status,
+              title, poster_url, created_at AS added_at
+       FROM watchlist
+       WHERE user_id = ?
+       ORDER BY created_at DESC`,
       [req.user.id]
     );
 
@@ -28,43 +28,54 @@ router.get('/', async (req, res) => {
   }
 });
 
-const ALLOWED_STATUSES = ['watching', 'completed', 'plan_to_watch', 'dropped', 'on_hold'];
-
-// POST /api/watchlist (Add or update anime status in user's watchlist)
+// POST /api/watchlist (Add or update media status in user's watchlist)
 router.post('/', async (req, res) => {
-  const { animeId, status = 'watching' } = req.body;
+  const { animeId, mediaType = 'movie', status = 'watching', title = '', posterUrl = '' } = req.body;
 
-  if (!animeId || !/^\d+$/.test(String(animeId))) {
-    return res.status(400).json({ error: 'Valid numeric animeId is required' });
+  if (!animeId || String(animeId).trim().length === 0 || String(animeId).length > 64) {
+    return res.status(400).json({ error: 'Valid animeId or media ID is required' });
   }
 
-  if (!ALLOWED_STATUSES.includes(status)) {
+  const cleanStatus = String(status).toLowerCase().trim();
+  if (!ALLOWED_STATUSES.includes(cleanStatus)) {
     return res.status(400).json({ error: `Invalid status. Allowed values: ${ALLOWED_STATUSES.join(', ')}` });
   }
 
+  const cleanMediaType = String(mediaType || 'movie').slice(0, 20);
+  const cleanTitle = String(title || '').slice(0, 255);
+  const cleanPoster = String(posterUrl || '').slice(0, 500);
+
   try {
     await pool.query(
-      `INSERT INTO watchlist (user_id, anime_id, status)
-       VALUES (?, ?, ?)
-       ON DUPLICATE KEY UPDATE status = VALUES(status)`,
-      [req.user.id, animeId, status]
+      `INSERT INTO watchlist (user_id, anime_id, media_type, status, title, poster_url)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         media_type = VALUES(media_type),
+         status = VALUES(status),
+         title = CASE WHEN VALUES(title) != '' THEN VALUES(title) ELSE title END,
+         poster_url = CASE WHEN VALUES(poster_url) != '' THEN VALUES(poster_url) ELSE poster_url END`,
+      [req.user.id, String(animeId), cleanMediaType, cleanStatus, cleanTitle, cleanPoster]
     );
 
-    res.status(200).json({ message: 'Watchlist updated successfully', animeId, status });
+    res.status(200).json({ message: 'Watchlist updated successfully', animeId, status: cleanStatus });
   } catch (error) {
     console.error('Add watchlist error:', error.message);
     res.status(500).json({ error: 'Failed to update watchlist' });
   }
 });
 
-// DELETE /api/watchlist/:animeId (Remove anime from user's watchlist)
+// DELETE /api/watchlist/:animeId (Remove media from user's watchlist)
 router.delete('/:animeId', async (req, res) => {
   const { animeId } = req.params;
+
+  if (!animeId || String(animeId).length > 64) {
+    return res.status(400).json({ error: 'Invalid media ID' });
+  }
 
   try {
     const [result] = await pool.query(
       'DELETE FROM watchlist WHERE user_id = ? AND anime_id = ?',
-      [req.user.id, animeId]
+      [req.user.id, String(animeId)]
     );
 
     if (result.affectedRows === 0) {
@@ -79,4 +90,3 @@ router.delete('/:animeId', async (req, res) => {
 });
 
 export default router;
-
