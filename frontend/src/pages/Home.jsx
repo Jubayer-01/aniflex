@@ -225,7 +225,7 @@ export default function Home() {
               <div className="space-y-2 text-center md:text-left">
                 <span className="text-xs font-bold text-[#94A3B8] tracking-wider uppercase">Unlimited Entertainment</span>
                 <h3 className="text-2xl sm:text-3xl font-black text-white">One App for All Your Streaming</h3>
-                <p className="text-xs sm:text-sm text-[#AAA2B7] max-w-xl">
+                <p className="text-xs sm:text-sm text-[#94A3B8] max-w-xl">
                   Switch instantly between Hollywood cinema, Bollywood blockbusters, trending TV dramas, and full anime seasons.
                 </p>
               </div>

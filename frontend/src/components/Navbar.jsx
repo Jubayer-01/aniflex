@@ -61,7 +61,7 @@ export default function Navbar({ onOpenSearch }) {
         </Link>
 
         {/* Center Pill Navigation with Smooth Gliding Active Pill */}
-        <nav className="hidden md:flex items-center bg-[#111318]/90 backdrop-blur-lg border border-white/10 rounded-full p-1.5 shadow-inner">
+        <nav className="hidden md:flex items-center bg-[#0F1115]/90 backdrop-blur-lg border border-white/10 rounded-full p-1.5 shadow-inner">
           {navLinks.map((link) => {
             const isActive = link.path.includes('?')
               ? location.pathname + location.search === link.path
@@ -101,7 +101,7 @@ export default function Navbar({ onOpenSearch }) {
             className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
               location.pathname === '/search'
                 ? 'bg-[#E2E8F0] text-black border-[#E2E8F0] shadow-sm scale-105'
-                : 'bg-[#111318]/90 hover:bg-white/10 border-white/10 text-[#94A3B8] hover:text-white'
+                : 'bg-[#0F1115]/90 hover:bg-white/10 border-white/10 text-[#94A3B8] hover:text-white'
             }`}
             title="Search"
           >
@@ -110,7 +110,7 @@ export default function Navbar({ onOpenSearch }) {
 
           <button
             aria-label="View notifications"
-            className="relative w-10 h-10 rounded-full bg-[#111318]/90 hover:bg-white/10 border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
+            className="relative w-10 h-10 rounded-full bg-[#0F1115]/90 hover:bg-white/10 border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
@@ -134,7 +134,7 @@ export default function Navbar({ onOpenSearch }) {
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 top-12 w-48 bg-[#111318] border border-white/10 rounded-2xl p-2 shadow-2xl space-y-1 z-50 text-xs">
+                <div className="absolute right-0 top-12 w-48 bg-[#0F1115] border border-white/10 rounded-2xl p-2 shadow-2xl space-y-1 z-50 text-xs">
                   <div className="px-3 py-2 border-b border-white/5">
                     <p className="font-bold text-white truncate">{user?.username}</p>
                     <p className="text-[11px] text-[#94A3B8] truncate">{user?.email}</p>
@@ -186,7 +186,7 @@ export default function Navbar({ onOpenSearch }) {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="md:hidden w-10 h-10 rounded-full bg-[#111318]/90 hover:bg-white/10 border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
+            className="md:hidden w-10 h-10 rounded-full bg-[#0F1115]/90 hover:bg-white/10 border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

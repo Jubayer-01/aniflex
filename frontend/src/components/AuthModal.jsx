@@ -77,7 +77,7 @@ export default function AuthModal() {
         <button
           onClick={closeAuthModal}
           aria-label="Close authentication modal"
-          className="absolute top-4 right-4 text-[#AAA2B7] hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+          className="absolute top-4 right-4 text-[#94A3B8] hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -92,7 +92,7 @@ export default function AuthModal() {
               Omni<span className="text-[#94A3B8]">Flex</span>
             </h2>
           </div>
-          <p className="text-xs text-[#AAA2B7]">
+          <p className="text-xs text-[#94A3B8]">
             {tab === 'login' && 'Sign in to access your personal watchlist and sync across devices'}
             {tab === 'register' && 'Create your free account to track movies, series and anime'}
             {tab === 'forgot' && 'Reset your account password'}
@@ -101,7 +101,7 @@ export default function AuthModal() {
 
         {/* Tab Switcher */}
         {tab !== 'forgot' && (
-          <div role="tablist" aria-label="Authentication modes" className="flex bg-[#111318] p-1 rounded-xl mb-6 border border-white/5">
+          <div role="tablist" aria-label="Authentication modes" className="flex bg-[#0F1115] p-1 rounded-xl mb-6 border border-white/5">
             <button
               role="tab"
               aria-selected={tab === 'login'}
@@ -150,7 +150,7 @@ export default function AuthModal() {
         <form onSubmit={handleSubmit} className="space-y-4 text-sm">
           {tab === 'register' && (
             <div>
-              <label htmlFor="auth-username" className="block text-xs font-bold text-[#AAA2B7] mb-1">Username</label>
+              <label htmlFor="auth-username" className="block text-xs font-bold text-[#94A3B8] mb-1">Username</label>
               <div className="relative">
                 <User className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
@@ -162,14 +162,14 @@ export default function AuthModal() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
-                  className="w-full bg-[#15171E] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-[#AAA2B7]/50 outline-none focus:border-[#E2E8F0] transition-colors"
+                  className="w-full bg-[#16181F] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-[#94A3B8]/50 outline-none focus:border-[#E2E8F0] transition-colors"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label htmlFor="auth-email" className="block text-xs font-bold text-[#AAA2B7] mb-1">Email Address</label>
+            <label htmlFor="auth-email" className="block text-xs font-bold text-[#94A3B8] mb-1">Email Address</label>
             <div className="relative">
               <Mail className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -182,7 +182,7 @@ export default function AuthModal() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@domain.com"
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-[#AAA2B7]/50 outline-none focus:border-[#E2E8F0] transition-colors"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-[#94A3B8]/50 outline-none focus:border-[#E2E8F0] transition-colors"
               />
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function AuthModal() {
           {tab !== 'forgot' && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label htmlFor="auth-password" className="text-xs font-bold text-[#AAA2B7]">Password</label>
+                <label htmlFor="auth-password" className="text-xs font-bold text-[#94A3B8]">Password</label>
                 {tab === 'login' && (
                   <button
                     type="button"
@@ -215,7 +215,7 @@ export default function AuthModal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-[#15171E] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-[#AAA2B7]/50 outline-none focus:border-[#E2E8F0] transition-colors"
+                  className="w-full bg-[#16181F] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-[#94A3B8]/50 outline-none focus:border-[#E2E8F0] transition-colors"
                 />
               </div>
             </div>

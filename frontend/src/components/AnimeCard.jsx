@@ -44,7 +44,7 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
   return (
     <div
       onClick={() => onClick && onClick(anime)}
-      className={`group relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#15171E] border border-white/10 hover:border-white/40 transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1.5 select-none ${
+      className={`group relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#16181F] border border-white/10 hover:border-white/40 transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1.5 select-none ${
         className || 'flex-none w-[145px] sm:w-[170px] md:w-[190px] lg:w-[205px] xl:w-[215px]'
       }`}
     >

@@ -164,7 +164,7 @@ export default function Movies() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07080B] text-white pt-24 pb-16 font-sans">
+    <div className="min-h-screen bg-[#060709] text-white pt-24 pb-16 font-sans">
       {/* 1. Cinematic Spotlight Banner */}
       {heroMovie && (
         <section className="relative w-full h-[55vh] min-h-[420px] max-h-[600px] overflow-hidden -mt-24 mb-10">
@@ -174,8 +174,8 @@ export default function Movies() {
             className="w-full h-full object-cover object-top filter brightness-75 scale-105"
           />
           {/* Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#07080B] via-[#07080B]/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#07080B] via-[#07080B]/60 to-transparent w-full lg:w-2/3" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#060709] via-[#060709]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#060709] via-[#060709]/60 to-transparent w-full lg:w-2/3" />
 
           {/* Hero Content */}
           <div className="absolute bottom-12 left-0 right-0 w-full px-4 sm:px-6 md:px-10 lg:px-12 z-20">
@@ -189,7 +189,7 @@ export default function Movies() {
                 {heroMovie.title}
               </h1>
 
-              <div className="flex items-center gap-3 text-xs text-[#AAA2B7] font-semibold">
+              <div className="flex items-center gap-3 text-xs text-[#94A3B8] font-semibold">
                 <span className="flex items-center gap-1 text-amber-400">
                   <Star className="w-3.5 h-3.5 fill-amber-400" />
                   {heroMovie.vote_average ? heroMovie.vote_average.toFixed(1) : '8.5'}
@@ -200,7 +200,7 @@ export default function Movies() {
                 <span className="px-2 py-0.5 rounded bg-white/10 text-white text-[10px]">4K Ultra HD</span>
               </div>
 
-              <p className="text-xs sm:text-sm text-[#AAA2B7] line-clamp-3 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#94A3B8] line-clamp-3 leading-relaxed">
                 {heroMovie.overview}
               </p>
 
@@ -226,7 +226,7 @@ export default function Movies() {
               <Film className="w-6 h-6 text-[#E2E8F0]" />
               <span>Cinema & Movies</span>
             </h2>
-            <p className="text-xs text-[#AAA2B7] mt-1">
+            <p className="text-xs text-[#94A3B8] mt-1">
               Browse Hollywood blockbusters, Bollywood blockbusters, and international features.
             </p>
           </div>
@@ -240,7 +240,7 @@ export default function Movies() {
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === cat.id
                     ? 'bg-[#E2E8F0] text-black shadow-md font-bold scale-105'
-                    : 'bg-[#15171E] text-[#AAA2B7] hover:text-white hover:bg-white/10 border border-white/5'
+                    : 'bg-[#16181F] text-[#94A3B8] hover:text-white hover:bg-white/10 border border-white/5'
                 }`}
               >
                 {cat.label}
@@ -257,7 +257,7 @@ export default function Movies() {
             {Array.from({ length: 18 }).map((_, i) => (
               <div
                 key={i}
-                className="aspect-[2/3] rounded-2xl bg-[#15171E] animate-pulse border border-white/5"
+                className="aspect-[2/3] rounded-2xl bg-[#16181F] animate-pulse border border-white/5"
               />
             ))}
           </div>
@@ -287,7 +287,7 @@ export default function Movies() {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-8 py-3.5 bg-[#15171E] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-2xl border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="px-8 py-3.5 bg-[#16181F] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-2xl border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 {loadingMore ? (
                   <>
@@ -301,7 +301,7 @@ export default function Movies() {
                   </>
                 )}
               </button>
-              <p className="text-xs text-[#AAA2B7]/70 font-mono">
+              <p className="text-xs text-[#94A3B8]/70 font-mono">
                 Showing {displayedMovies.length} movies from TMDB cinema catalog
               </p>
             </div>

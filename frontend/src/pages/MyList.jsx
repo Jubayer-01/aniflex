@@ -49,13 +49,13 @@ export default function MyList() {
             <span>My Library</span>
             <Bookmark className="w-6 h-6 text-[#94A3B8] fill-[#94A3B8]" />
           </h1>
-          <p className="text-sm text-[#AAA2B7] mt-1">
+          <p className="text-sm text-[#94A3B8] mt-1">
             Manage your personal watchlist and viewing progress.
           </p>
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex items-center gap-2 bg-[#111318] p-1.5 rounded-xl border border-white/10">
+        <div className="flex items-center gap-2 bg-[#0F1115] p-1.5 rounded-xl border border-white/10">
           <button
             onClick={() => setActiveTab('saved')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
@@ -109,9 +109,9 @@ export default function MyList() {
           </div>
         ) : (
           <div className="py-20 text-center space-y-3">
-            <Bookmark className="w-12 h-12 text-[#AAA2B7]/40 mx-auto" />
+            <Bookmark className="w-12 h-12 text-[#94A3B8]/40 mx-auto" />
             <h3 className="text-lg font-bold text-white">Your watchlist is empty</h3>
-            <p className="text-xs text-[#AAA2B7]">Save anime by clicking the bookmark icon while browsing.</p>
+            <p className="text-xs text-[#94A3B8]">Save anime by clicking the bookmark icon while browsing.</p>
             <button
               onClick={() => navigate('/')}
               className="mt-2 bg-[#E2E8F0] hover:bg-white text-black px-5 py-2.5 rounded-xl font-bold text-xs"
@@ -125,12 +125,12 @@ export default function MyList() {
           <ContinueWatchingRow items={historyList} />
         </div>
       ) : (
-        <div className="py-20 text-center space-y-3 bg-[#111318] rounded-3xl border border-white/5 p-8 max-w-xl mx-auto">
-          <div className="w-14 h-14 rounded-2xl bg-[#15171E] border border-white/10 flex items-center justify-center mx-auto text-[#94A3B8] shadow-xl">
+        <div className="py-20 text-center space-y-3 bg-[#0F1115] rounded-3xl border border-white/5 p-8 max-w-xl mx-auto">
+          <div className="w-14 h-14 rounded-2xl bg-[#16181F] border border-white/10 flex items-center justify-center mx-auto text-[#94A3B8] shadow-xl">
             <History className="w-7 h-7" />
           </div>
           <h3 className="text-lg font-bold text-white">No Watch History Yet</h3>
-          <p className="text-xs text-[#AAA2B7] max-w-sm mx-auto">
+          <p className="text-xs text-[#94A3B8] max-w-sm mx-auto">
             Anime you watch will automatically be listed here so you can easily resume any episode.
           </p>
           <button

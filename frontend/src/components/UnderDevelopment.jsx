@@ -43,7 +43,7 @@ export default function UnderDevelopment({ onUnlock }) {
         <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mb-3">
           We’re Crafting Something Great
         </h1>
-        <p className="text-sm text-[#AAA2B7] leading-relaxed mb-8">
+        <p className="text-sm text-[#94A3B8] leading-relaxed mb-8">
           OmniFlex is currently offline for scheduled infrastructure upgrades, database optimizations, and design tuning.
           The platform will return shortly.
         </p>
@@ -64,7 +64,7 @@ export default function UnderDevelopment({ onUnlock }) {
         {!showPasscodeInput ? (
           <button
             onClick={() => setShowPasscodeInput(true)}
-            className="text-[11px] text-[#AAA2B7]/50 hover:text-white transition-colors inline-flex items-center gap-1.5"
+            className="text-[11px] text-[#94A3B8]/50 hover:text-white transition-colors inline-flex items-center gap-1.5"
           >
             <Lock className="w-3 h-3" />
             <span>Developer Access</span>
@@ -76,7 +76,7 @@ export default function UnderDevelopment({ onUnlock }) {
               placeholder="Enter passcode (admin)"
               value={passcode}
               onChange={(e) => setPasscode(e.target.value)}
-              className={`w-full px-3.5 py-2 text-xs bg-[#090A0F] border rounded-xl focus:outline-none transition-all ${
+              className={`w-full px-3.5 py-2 text-xs bg-[#060709] border rounded-xl focus:outline-none transition-all ${
                 error ? 'border-red-500 text-red-400' : 'border-white/10 text-white focus:border-[#E2E8F0]'
               }`}
               autoFocus
@@ -93,7 +93,7 @@ export default function UnderDevelopment({ onUnlock }) {
       </div>
 
       {/* Footer copyright note */}
-      <div className="relative z-10 mt-8 text-[11px] text-[#AAA2B7]/40">
+      <div className="relative z-10 mt-8 text-[11px] text-[#94A3B8]/40">
         © 2026 OmniFlex • Private Development Sandbox
       </div>
     </div>

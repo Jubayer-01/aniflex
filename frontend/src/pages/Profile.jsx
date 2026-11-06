@@ -57,9 +57,9 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-[#060709] text-white pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-8">
       {/* Profile Card Header */}
-      <div className="bg-[#111318] border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 shadow-2xl relative overflow-hidden">
+      <div className="bg-[#0F1115] border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 shadow-2xl relative overflow-hidden">
         <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#1E2028] border-2 border-white/20 p-1 flex-none shadow-xl overflow-hidden">
-          <div className="w-full h-full bg-[#111318] rounded-full flex items-center justify-center text-white overflow-hidden">
+          <div className="w-full h-full bg-[#0F1115] rounded-full flex items-center justify-center text-white overflow-hidden">
             {user?.avatar_url ? (
               <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
             ) : (
@@ -75,39 +75,39 @@ export default function Profile() {
               <Sparkles className="w-3 h-3" /> {user?.role === 'admin' ? 'Administrator' : 'VIP Member'}
             </span>
           </div>
-          <p className="text-xs text-[#AAA2B7]">{user?.email}</p>
+          <p className="text-xs text-[#94A3B8]">{user?.email}</p>
         </div>
       </div>
 
       {/* Stats Counter */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#15171E] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
+        <div className="bg-[#16181F] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-white/10 text-[#E2E8F0] flex items-center justify-center">
             <Film className="w-6 h-6" />
           </div>
           <div>
             <span className="text-2xl font-black text-white">42</span>
-            <p className="text-xs text-[#AAA2B7]">Anime Completed</p>
+            <p className="text-xs text-[#94A3B8]">Anime Completed</p>
           </div>
         </div>
 
-        <div className="bg-[#15171E] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
+        <div className="bg-[#16181F] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
             <Flame className="w-6 h-6" />
           </div>
           <div>
             <span className="text-2xl font-black text-white">528</span>
-            <p className="text-xs text-[#AAA2B7]">Episodes Watched</p>
+            <p className="text-xs text-[#94A3B8]">Episodes Watched</p>
           </div>
         </div>
 
-        <div className="bg-[#15171E] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
+        <div className="bg-[#16181F] p-5 rounded-2xl border border-white/10 flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
             <Clock className="w-6 h-6" />
           </div>
           <div>
             <span className="text-2xl font-black text-white">214h</span>
-            <p className="text-xs text-[#AAA2B7]">Hours Streamed</p>
+            <p className="text-xs text-[#94A3B8]">Hours Streamed</p>
           </div>
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function Profile() {
       {/* Account Settings Forms */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Edit Profile */}
-        <div className="bg-[#111318] p-6 rounded-3xl border border-white/10 space-y-4">
+        <div className="bg-[#0F1115] p-6 rounded-3xl border border-white/10 space-y-4">
           <h2 className="text-base font-bold text-white flex items-center gap-2">
             <User className="w-4 h-4 text-[#94A3B8]" />
             <span>Update Profile</span>
@@ -132,23 +132,23 @@ export default function Profile() {
 
           <form onSubmit={handleUpdateProfile} className="space-y-3 text-xs">
             <div>
-              <label className="block text-[#AAA2B7] font-semibold mb-1">Username</label>
+              <label className="block text-[#94A3B8] font-semibold mb-1">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
               />
             </div>
 
             <div>
-              <label className="block text-[#AAA2B7] font-semibold mb-1">Avatar Image URL</label>
+              <label className="block text-[#94A3B8] font-semibold mb-1">Avatar Image URL</label>
               <input
                 type="url"
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
                 placeholder="https://example.com/avatar.jpg"
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
               />
             </div>
 
@@ -163,7 +163,7 @@ export default function Profile() {
         </div>
 
         {/* Change Password */}
-        <div className="bg-[#111318] p-6 rounded-3xl border border-white/10 space-y-4">
+        <div className="bg-[#0F1115] p-6 rounded-3xl border border-white/10 space-y-4">
           <h2 className="text-base font-bold text-white flex items-center gap-2">
             <KeyRound className="w-4 h-4 text-[#94A3B8]" />
             <span>Change Password</span>
@@ -180,26 +180,26 @@ export default function Profile() {
 
           <form onSubmit={handleChangePassword} className="space-y-3 text-xs">
             <div>
-              <label className="block text-[#AAA2B7] font-semibold mb-1">Current Password</label>
+              <label className="block text-[#94A3B8] font-semibold mb-1">Current Password</label>
               <input
                 type="password"
                 required
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
               />
             </div>
 
             <div>
-              <label className="block text-[#AAA2B7] font-semibold mb-1">New Password (min 6 chars)</label>
+              <label className="block text-[#94A3B8] font-semibold mb-1">New Password (min 6 chars)</label>
               <input
                 type="password"
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-[#E2E8F0]"
               />
             </div>
 
@@ -225,7 +225,7 @@ export default function Profile() {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="text-sm font-semibold text-white">Autoplay Next Episode</h4>
-              <p className="text-[#AAA2B7]">Transition to next episode automatically</p>
+              <p className="text-[#94A3B8]">Transition to next episode automatically</p>
             </div>
             <button
               onClick={() => setAutoplayNext(!autoplayNext)}
@@ -244,7 +244,7 @@ export default function Profile() {
           <div className="flex items-center justify-between pt-2">
             <div>
               <h4 className="text-sm font-semibold text-white">Default Audio Language</h4>
-              <p className="text-[#AAA2B7]">Preferred voice track</p>
+              <p className="text-[#94A3B8]">Preferred voice track</p>
             </div>
             <div className="flex items-center gap-2">
               {['Sub (Original Japanese)', 'Dub (English)'].map((opt) => (
@@ -254,7 +254,7 @@ export default function Profile() {
                   className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${
                     preferredAudio === opt
                       ? 'bg-[#E2E8F0] border-[#E2E8F0] text-black font-bold shadow-sm'
-                      : 'bg-[#15171E] border-white/10 text-[#94A3B8] hover:text-white'
+                      : 'bg-[#16181F] border-white/10 text-[#94A3B8] hover:text-white'
                   }`}
                 >
                   {opt}

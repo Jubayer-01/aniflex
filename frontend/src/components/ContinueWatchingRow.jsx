@@ -30,7 +30,7 @@ export default function ContinueWatchingRow({ items = [] }) {
           <div
             key={item.id}
             onClick={() => navigate(`/watch/${item.id}?ep=${item.episodeNumber || 1}`)}
-            className="group relative bg-[#15171E] rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1"
+            className="group relative bg-[#16181F] rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1"
           >
             {/* Thumbnail */}
             <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#0F1115]">
@@ -44,7 +44,7 @@ export default function ContinueWatchingRow({ items = [] }) {
                   e.currentTarget.src = item.cover || "https://images.alphacoders.com/131/1314905.jpeg";
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#15171E] via-transparent to-transparent opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#16181F] via-transparent to-transparent opacity-80" />
 
               {/* Floating Remove Button */}
               <button

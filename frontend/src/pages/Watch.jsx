@@ -549,7 +549,7 @@ export default function Watch() {
     return (
       <div className="min-h-[70vh] bg-[#060709] flex flex-col items-center justify-center gap-3">
         <div className="w-10 h-10 border-2 border-[#E2E8F0] border-t-transparent rounded-full animate-spin" />
-        <span className="text-xs text-[#AAA2B7] font-medium tracking-wide animate-pulse">Loading Title...</span>
+        <span className="text-xs text-[#94A3B8] font-medium tracking-wide animate-pulse">Loading Title...</span>
       </div>
     );
   }
@@ -563,7 +563,7 @@ export default function Watch() {
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3 px-2">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#AAA2B7] hover:text-white transition-colors group"
+              className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#94A3B8] hover:text-white transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Browse</span>
@@ -571,13 +571,13 @@ export default function Watch() {
 
             <div className="flex flex-wrap items-center gap-2">
               {/* Server Switcher */}
-              <div className="flex items-center gap-1 bg-[#111318] border border-white/10 rounded-full px-2 py-1 text-xs">
-                <span className="text-[#AAA2B7] text-[11px] px-2 font-medium">Server:</span>
+              <div className="flex items-center gap-1 bg-[#0F1115] border border-white/10 rounded-full px-2 py-1 text-xs">
+                <span className="text-[#94A3B8] text-[11px] px-2 font-medium">Server:</span>
                 <button
                   onClick={() => setStreamServer('server1')}
                   className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'server1'
                     ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
+                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
                   Server 1 (HD Stream)
@@ -586,7 +586,7 @@ export default function Watch() {
                   onClick={() => setStreamServer('server2')}
                   className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${streamServer === 'server2'
                     ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
+                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
                   Server 2 (Backup Node)
@@ -595,15 +595,15 @@ export default function Watch() {
 
               {/* Audio Language Switcher (Anime only) */}
               {mediaType === 'anime' && (
-                <div className="flex items-center gap-1 bg-[#111318] border border-white/10 rounded-full px-2 py-1 text-xs">
-                  <span className="text-[#AAA2B7] text-[11px] px-2 font-medium">Audio:</span>
+                <div className="flex items-center gap-1 bg-[#0F1115] border border-white/10 rounded-full px-2 py-1 text-xs">
+                  <span className="text-[#94A3B8] text-[11px] px-2 font-medium">Audio:</span>
                   {['Sub (JP)', 'Dub (EN)'].map((srv) => (
                     <button
                       key={srv}
                       onClick={() => setActiveServer(srv)}
                       className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${activeServer === srv
                         ? 'bg-[#E2E8F0] text-black shadow-sm'
-                        : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
+                        : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                         }`}
                     >
                       {srv}
@@ -662,7 +662,7 @@ export default function Watch() {
           )}
 
           {/* Stream Player Controls & Fallback */}
-          <div className="flex items-center justify-between text-xs text-[#AAA2B7]/70 mt-3 px-2 flex-wrap gap-2">
+          <div className="flex items-center justify-between text-xs text-[#94A3B8]/70 mt-3 px-2 flex-wrap gap-2">
             <span>
               {mediaType === 'movie'
                 ? 'Streaming in 4K/1080p. Switch between Server 1 and Server 2 if any node buffers.'
@@ -696,7 +696,7 @@ export default function Watch() {
       {/* 2. MEDIA DETAILS CARD (Dedicated Titanium Layout for Movies matching reference) */}
       {mediaType === 'movie' ? (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-[#111318] rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
+          <div className="bg-[#0F1115] rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
             {/* Movie Poster (Clean, no trailer button per request) */}
             <div className="w-36 sm:w-52 aspect-[2/3] rounded-2xl overflow-hidden flex-none shadow-2xl border border-white/10 mx-auto md:mx-0 bg-black/60">
               <img
@@ -735,7 +735,7 @@ export default function Watch() {
                     className={`p-2.5 rounded-xl border transition-all text-xs flex items-center gap-1.5 cursor-pointer ${
                       isSaved
                         ? 'bg-white text-black border-white'
-                        : 'bg-[#15171E] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
+                        : 'bg-[#16181F] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
                     }`}
                     title="Add to Watchlist"
                   >
@@ -746,7 +746,7 @@ export default function Watch() {
                       navigator.clipboard?.writeText(window.location.href);
                       alert('Movie link copied to clipboard!');
                     }}
-                    className="p-2.5 rounded-xl bg-[#15171E] border border-white/10 text-gray-300 hover:text-white transition-all text-xs cursor-pointer"
+                    className="p-2.5 rounded-xl bg-[#16181F] border border-white/10 text-gray-300 hover:text-white transition-all text-xs cursor-pointer"
                     title="Share Movie"
                   >
                     <Share2 className="w-4 h-4" />
@@ -755,7 +755,7 @@ export default function Watch() {
               </div>
 
               {/* Storyline / Synopsis */}
-              <p className="text-sm text-[#AAA2B7] italic leading-relaxed pt-1">
+              <p className="text-sm text-[#94A3B8] italic leading-relaxed pt-1">
                 {cleanSeriesDesc || 'No synopsis available for this feature film.'}
               </p>
 
@@ -771,11 +771,11 @@ export default function Watch() {
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-bold text-white min-w-[70px]">Actor:</span>
-                    <span className="text-[#AAA2B7] line-clamp-1">{movieCast}</span>
+                    <span className="text-[#94A3B8] line-clamp-1">{movieCast}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-bold text-white min-w-[70px]">Director:</span>
-                    <span className="text-[#AAA2B7]">{movieDirector}</span>
+                    <span className="text-[#94A3B8]">{movieDirector}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-bold text-white min-w-[70px]">Country:</span>
@@ -793,7 +793,7 @@ export default function Watch() {
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-bold text-white min-w-[70px]">Duration:</span>
-                    <span className="text-[#AAA2B7]">{formattedMovieDuration}</span>
+                    <span className="text-[#94A3B8]">{formattedMovieDuration}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-bold text-white min-w-[70px]">Release:</span>
@@ -823,7 +823,7 @@ export default function Watch() {
       ) : (
         /* Series / Anime Standard Details Card */
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-[#111318] rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
+          <div className="bg-[#0F1115] rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
             <div className="w-32 sm:w-44 aspect-[2/3] rounded-2xl overflow-hidden flex-none shadow-2xl border border-white/10 mx-auto md:mx-0">
               <img
                 src={anime?.coverImage?.large || anime?.coverImage?.extraLarge || 'https://images.alphacoders.com/891/891040.jpg'}
@@ -849,7 +849,7 @@ export default function Watch() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 bg-[#15171E] px-3 py-1 rounded-xl border border-white/10 text-amber-400 font-bold text-xs sm:text-sm">
+                  <div className="flex items-center gap-1 bg-[#16181F] px-3 py-1 rounded-xl border border-white/10 text-amber-400 font-bold text-xs sm:text-sm">
                     <Star className="w-4 h-4 fill-amber-400" />
                     <span>{score}</span>
                   </div>
@@ -859,8 +859,8 @@ export default function Watch() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[#AAA2B7] font-medium">
-                <span className="bg-[#15171E] border border-white/10 px-2.5 py-0.5 rounded text-white font-bold">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[#94A3B8] font-medium">
+                <span className="bg-[#16181F] border border-white/10 px-2.5 py-0.5 rounded text-white font-bold">
                   14+
                 </span>
                 <span>•</span>
@@ -879,7 +879,7 @@ export default function Watch() {
                 {anime?.genres?.map((g) => (
                   <span
                     key={g}
-                    className="bg-[#15171E] border border-white/10 text-white text-xs font-medium px-2.5 py-0.5 rounded-lg"
+                    className="bg-[#16181F] border border-white/10 text-white text-xs font-medium px-2.5 py-0.5 rounded-lg"
                   >
                     {g}
                   </span>
@@ -891,7 +891,7 @@ export default function Watch() {
                   onClick={handleLike}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all ${userReaction === 'like'
                     ? 'bg-[#E2E8F0] text-black border-[#E2E8F0]'
-                    : 'bg-[#15171E] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
+                    : 'bg-[#16181F] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
                     }`}
                 >
                   <ThumbsUp className={`w-4 h-4 ${userReaction === 'like' ? 'fill-black' : ''}`} />
@@ -902,7 +902,7 @@ export default function Watch() {
                   onClick={handleDislike}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all ${userReaction === 'dislike'
                     ? 'bg-red-600 text-white border-red-600'
-                    : 'bg-[#15171E] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
+                    : 'bg-[#16181F] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
                     }`}
                 >
                   <ThumbsDown className={`w-4 h-4 ${userReaction === 'dislike' ? 'fill-white' : ''}`} />
@@ -913,7 +913,7 @@ export default function Watch() {
                   onClick={() => setIsSaved(!isSaved)}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all ${isSaved
                     ? 'bg-[#E2E8F0] text-black border-[#E2E8F0]'
-                    : 'bg-[#15171E] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
+                    : 'bg-[#16181F] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
                     }`}
                   title="Add to Watchlist"
                 >
@@ -926,7 +926,7 @@ export default function Watch() {
                     navigator.clipboard?.writeText(window.location.href);
                     alert('Link copied to clipboard!');
                   }}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#15171E] border border-white/10 text-gray-300 hover:text-white hover:border-white/20 transition-all"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#16181F] border border-white/10 text-gray-300 hover:text-white hover:border-white/20 transition-all"
                   title="Share"
                 >
                   <Share2 className="w-4 h-4" />
@@ -935,7 +935,7 @@ export default function Watch() {
               </div>
 
               <div className="pt-2 border-t border-white/5">
-                <p className={`text-sm text-[#AAA2B7] leading-relaxed transition-all ${showFullDesc ? '' : 'line-clamp-2'}`}>
+                <p className={`text-sm text-[#94A3B8] leading-relaxed transition-all ${showFullDesc ? '' : 'line-clamp-2'}`}>
                   {cleanSeriesDesc}
                 </p>
                 <button
@@ -962,7 +962,7 @@ export default function Watch() {
                 <div className="relative">
                   <button
                     onClick={() => setIsSeasonDropdownOpen(!isSeasonDropdownOpen)}
-                    className="flex items-center gap-2.5 bg-[#15171E] hover:bg-[#1A1D26] text-white border border-emerald-500/40 hover:border-emerald-500/70 px-4 py-2 rounded-xl text-sm font-bold shadow-lg transition-all cursor-pointer"
+                    className="flex items-center gap-2.5 bg-[#16181F] hover:bg-[#16181F] text-white border border-emerald-500/40 hover:border-emerald-500/70 px-4 py-2 rounded-xl text-sm font-bold shadow-lg transition-all cursor-pointer"
                   >
                     <Tv className="w-4 h-4 text-emerald-400" />
                     <span>
@@ -978,7 +978,7 @@ export default function Watch() {
                         className="fixed inset-0 z-40"
                         onClick={() => setIsSeasonDropdownOpen(false)}
                       />
-                      <div className="absolute left-0 mt-2 w-56 bg-[#111318] border border-white/15 rounded-2xl shadow-2xl py-2 z-50 backdrop-blur-2xl max-h-80 overflow-y-auto no-scrollbar">
+                      <div className="absolute left-0 mt-2 w-56 bg-[#0F1115] border border-white/15 rounded-2xl shadow-2xl py-2 z-50 backdrop-blur-2xl max-h-80 overflow-y-auto no-scrollbar">
                         {tvSeasonsList.map((season) => (
                           <button
                             key={season.id || season.season_number}
@@ -990,7 +990,7 @@ export default function Watch() {
                             className={`w-full text-left px-4 py-2.5 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
                               tvSeasonNum === season.season_number
                                 ? 'bg-emerald-600/20 text-emerald-400 font-bold'
-                                : 'text-[#AAA2B7] hover:text-white hover:bg-white/5'
+                                : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                             }`}
                           >
                             <span>{season.name || `Season ${season.season_number}`}</span>
@@ -1004,7 +1004,7 @@ export default function Watch() {
                   )}
                 </div>
 
-                <span className="text-xs text-[#AAA2B7] font-medium">
+                <span className="text-xs text-[#94A3B8] font-medium">
                   {tvEpisodesList.length} Episodes Available
                 </span>
               </div>
@@ -1013,7 +1013,7 @@ export default function Watch() {
               {loadingEpisodes ? (
                 <div className="space-y-3">
                   {Array.from({ length: 6 }).map((_, idx) => (
-                    <div key={idx} className="h-24 rounded-2xl bg-[#15171E] animate-pulse border border-white/5" />
+                    <div key={idx} className="h-24 rounded-2xl bg-[#16181F] animate-pulse border border-white/5" />
                   ))}
                 </div>
               ) : (
@@ -1030,8 +1030,8 @@ export default function Watch() {
                         }}
                         className={`group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
                           isPlaying
-                            ? 'bg-[#15171E] border-emerald-500/50 ring-1 ring-emerald-500/30 shadow-xl'
-                            : 'bg-[#111318]/70 hover:bg-[#15171E] border-white/5 hover:border-white/15'
+                            ? 'bg-[#16181F] border-emerald-500/50 ring-1 ring-emerald-500/30 shadow-xl'
+                            : 'bg-[#0F1115]/70 hover:bg-[#16181F] border-white/5 hover:border-white/15'
                         }`}
                       >
                         {/* 16:9 Thumbnail with Play Overlay */}
@@ -1073,7 +1073,7 @@ export default function Watch() {
                               {new Date(ep.air_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                             </div>
                           )}
-                          <p className="text-xs text-[#AAA2B7] line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-[#94A3B8] line-clamp-2 leading-relaxed">
                             {ep.overview || 'No synopsis available for this episode.'}
                           </p>
                         </div>
@@ -1101,7 +1101,7 @@ export default function Watch() {
                     <Tv className="w-6 h-6 text-[#94A3B8]" />
                     <span>Seasons & Episodes</span>
                   </h2>
-                  <p className="text-xs text-[#AAA2B7] mt-1">
+                  <p className="text-xs text-[#94A3B8] mt-1">
                     Select an episode to stream instantly in HD.
                   </p>
                 </div>
@@ -1116,12 +1116,12 @@ export default function Watch() {
               {/* Episode Batch Range Filter */}
               {episodeChunks.length > 0 && (
                 <div className="relative flex items-center gap-2 w-full">
-                  <span className="text-xs font-semibold text-[#AAA2B7] flex-none pr-1">Episode Range:</span>
+                  <span className="text-xs font-semibold text-[#94A3B8] flex-none pr-1">Episode Range:</span>
 
                   <button
                     onClick={() => scrollRange('left')}
                     aria-label="Scroll episode ranges left"
-                    className="flex-none p-1.5 rounded-xl bg-[#15171E] hover:bg-white hover:text-black border border-white/10 text-gray-300 transition-all shadow-md active:scale-95"
+                    className="flex-none p-1.5 rounded-xl bg-[#16181F] hover:bg-white hover:text-black border border-white/10 text-gray-300 transition-all shadow-md active:scale-95"
                     title="Previous ranges"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -1138,7 +1138,7 @@ export default function Watch() {
                         className={`flex-none px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                           selectedChunkIdx === idx
                             ? 'bg-[#E2E8F0] text-black border-[#E2E8F0] shadow-sm'
-                            : 'bg-[#15171E] border-white/10 text-[#94A3B8] hover:text-white hover:border-white/20'
+                            : 'bg-[#16181F] border-white/10 text-[#94A3B8] hover:text-white hover:border-white/20'
                         }`}
                       >
                         {chunk.label}
@@ -1149,7 +1149,7 @@ export default function Watch() {
                   <button
                     onClick={() => scrollRange('right')}
                     aria-label="Scroll episode ranges right"
-                    className="flex-none p-1.5 rounded-xl bg-[#15171E] hover:bg-white hover:text-black border border-white/10 text-gray-300 transition-all shadow-md active:scale-95"
+                    className="flex-none p-1.5 rounded-xl bg-[#16181F] hover:bg-white hover:text-black border border-white/10 text-gray-300 transition-all shadow-md active:scale-95"
                     title="Next ranges"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -1165,7 +1165,7 @@ export default function Watch() {
                     <div
                       key={ep.number}
                       onClick={() => handleSelectEpisode(ep.number)}
-                      className={`group relative rounded-2xl overflow-hidden bg-[#15171E] border transition-all duration-300 cursor-pointer hover:-translate-y-1 shadow-lg ${
+                      className={`group relative rounded-2xl overflow-hidden bg-[#16181F] border transition-all duration-300 cursor-pointer hover:-translate-y-1 shadow-lg ${
                         isPlaying
                           ? 'border-[#E2E8F0] ring-1 ring-white/40 shadow-xl'
                           : 'border-white/10 hover:border-white/30'
@@ -1178,7 +1178,7 @@ export default function Watch() {
                           loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#15171E] via-transparent to-transparent opacity-80" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#16181F] via-transparent to-transparent opacity-80" />
 
                         <div
                           className={`absolute inset-0 flex items-center justify-center transition-opacity ${
@@ -1217,11 +1217,11 @@ export default function Watch() {
                           )}
                         </div>
 
-                        <p className="text-xs text-[#AAA2B7] line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[#94A3B8] line-clamp-2 leading-relaxed">
                           {ep.synopsis}
                         </p>
 
-                        <div className="flex items-center justify-between text-[11px] text-[#AAA2B7] pt-1 border-t border-white/5">
+                        <div className="flex items-center justify-between text-[11px] text-[#94A3B8] pt-1 border-t border-white/5">
                           <span>{ep.released}</span>
                           <span className="text-gray-400 font-medium">Sub | Dub</span>
                         </div>

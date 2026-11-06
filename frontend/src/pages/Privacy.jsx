@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 
 export default function Privacy() {
   return (
-    <div className="min-h-screen bg-[#07080B] text-white pt-28 pb-20 px-4 sm:px-6 md:px-10 lg:px-16 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#060709] text-white pt-28 pb-20 px-4 sm:px-6 md:px-10 lg:px-16 max-w-4xl mx-auto">
       <Link
         to="/"
-        className="inline-flex items-center gap-2 text-xs font-semibold text-[#AAA2B7] hover:text-white mb-6 transition-colors group"
+        className="inline-flex items-center gap-2 text-xs font-semibold text-[#94A3B8] hover:text-white mb-6 transition-colors group"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         <span>Back to Home</span>
@@ -19,11 +19,11 @@ export default function Privacy() {
         </div>
         <div>
           <h1 className="text-3xl font-black">Privacy Policy</h1>
-          <p className="text-xs text-[#AAA2B7]">Last updated: November 2026</p>
+          <p className="text-xs text-[#94A3B8]">Last updated: November 2026</p>
         </div>
       </div>
 
-      <div className="space-y-6 text-sm text-[#AAA2B7] leading-relaxed bg-[#111318] p-6 sm:p-8 rounded-3xl border border-white/10 shadow-xl">
+      <div className="space-y-6 text-sm text-[#94A3B8] leading-relaxed bg-[#0F1115] p-6 sm:p-8 rounded-3xl border border-white/10 shadow-xl">
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">1. Information We Collect</h2>
           <p>

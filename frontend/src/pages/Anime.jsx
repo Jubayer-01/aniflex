@@ -222,7 +222,7 @@ export default function Anime() {
           <div className="flex justify-center pt-8 pb-4">
             <button
               onClick={() => navigate('/explore')}
-              className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#15171E] hover:bg-[#E2E8F0] hover:text-black border border-white/10 hover:border-white text-white font-bold text-sm tracking-wide transition-all shadow-lg hover:scale-105 active:scale-95"
+              className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#16181F] hover:bg-[#E2E8F0] hover:text-black border border-white/10 hover:border-white text-white font-bold text-sm tracking-wide transition-all shadow-lg hover:scale-105 active:scale-95"
             >
               <span>Explore All Anime</span>
               <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-black group-hover:translate-x-1 transition-all" />

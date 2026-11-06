@@ -50,7 +50,7 @@ export default function AnimeRow({ title, items = [], loading = false, seeAllLin
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-[#111318]/90 hover:bg-white hover:text-black border border-white/20 text-white flex items-center justify-center transition-all shadow-xl backdrop-blur-md opacity-0 group-hover/row:opacity-100"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-[#0F1115]/90 hover:bg-white hover:text-black border border-white/20 text-white flex items-center justify-center transition-all shadow-xl backdrop-blur-md opacity-0 group-hover/row:opacity-100"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-6 h-6" />
@@ -61,7 +61,7 @@ export default function AnimeRow({ title, items = [], loading = false, seeAllLin
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-[#111318]/90 hover:bg-white hover:text-black border border-white/20 text-white flex items-center justify-center transition-all shadow-xl backdrop-blur-md opacity-0 group-hover/row:opacity-100"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-[#0F1115]/90 hover:bg-white hover:text-black border border-white/20 text-white flex items-center justify-center transition-all shadow-xl backdrop-blur-md opacity-0 group-hover/row:opacity-100"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-6 h-6" />
@@ -78,7 +78,7 @@ export default function AnimeRow({ title, items = [], loading = false, seeAllLin
             ? Array.from({ length: 8 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="flex-none w-[145px] sm:w-[170px] md:w-[190px] lg:w-[205px] xl:w-[215px] aspect-[2/3] rounded-2xl bg-[#15171E] animate-pulse border border-white/5"
+                  className="flex-none w-[145px] sm:w-[170px] md:w-[190px] lg:w-[205px] xl:w-[215px] aspect-[2/3] rounded-2xl bg-[#16181F] animate-pulse border border-white/5"
                 />
               ))
             : items.map((anime) => (

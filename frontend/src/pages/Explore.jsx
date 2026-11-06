@@ -217,7 +217,7 @@ export default function Explore() {
             <span>{query.trim() ? `Results for "${query.trim()}"` : 'Explore Anime'}</span>
             <Sparkles className="w-6 h-6 text-[#94A3B8]" />
           </h1>
-          <p className="text-sm text-[#AAA2B7] mt-1">
+          <p className="text-sm text-[#94A3B8] mt-1">
             Filter through thousands of anime series, movies, and specials with advanced criteria.
           </p>
         </div>
@@ -232,12 +232,12 @@ export default function Explore() {
               value={query}
               onChange={(e) => handleQueryChange(e.target.value)}
               placeholder="Search title, character..."
-              className="w-full bg-[#111318] border border-white/10 rounded-xl pl-10 pr-9 py-2 text-sm text-white placeholder-[#AAA2B7] outline-none focus:border-[#E2E8F0] transition-colors"
+              className="w-full bg-[#0F1115] border border-white/10 rounded-xl pl-10 pr-9 py-2 text-sm text-white placeholder-[#94A3B8] outline-none focus:border-[#E2E8F0] transition-colors"
             />
             {query && (
               <button
                 onClick={handleClearQuery}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AAA2B7] hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-white"
                 title="Clear Search"
               >
                 <X className="w-4 h-4" />
@@ -251,7 +251,7 @@ export default function Explore() {
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
               showFiltersPanel
                 ? 'bg-[#E2E8F0] text-black border-[#E2E8F0]'
-                : 'bg-[#111318] text-gray-300 hover:text-white border-white/10 hover:border-white/20'
+                : 'bg-[#0F1115] text-gray-300 hover:text-white border-white/10 hover:border-white/20'
             }`}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -269,10 +269,10 @@ export default function Explore() {
           <select
             value={selectedSort}
             onChange={(e) => updateFilterParam('sort', e.target.value)}
-            className="bg-[#111318] border border-white/10 rounded-xl px-3.5 py-2 text-xs font-semibold text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
+            className="bg-[#0F1115] border border-white/10 rounded-xl px-3.5 py-2 text-xs font-semibold text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
           >
             {SORTS.map((s) => (
-              <option key={s.value} value={s.value} className="bg-[#111318]">
+              <option key={s.value} value={s.value} className="bg-[#0F1115]">
                 {s.label}
               </option>
             ))}
@@ -282,7 +282,7 @@ export default function Explore() {
 
       {/* 2. Collapsible Advanced Filters Drawer */}
       {showFiltersPanel && (
-        <div className="bg-[#111318] border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
+        <div className="bg-[#0F1115] border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* Format Dropdown */}
             <div className="space-y-1.5">
@@ -290,10 +290,10 @@ export default function Explore() {
               <select
                 value={selectedFormat}
                 onChange={(e) => updateFilterParam('format', e.target.value)}
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
               >
                 {FORMATS.map((f) => (
-                  <option key={f.value} value={f.value} className="bg-[#15171E]">
+                  <option key={f.value} value={f.value} className="bg-[#16181F]">
                     {f.label}
                   </option>
                 ))}
@@ -306,10 +306,10 @@ export default function Explore() {
               <select
                 value={selectedStatus}
                 onChange={(e) => updateFilterParam('status', e.target.value)}
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
               >
                 {STATUSES.map((s) => (
-                  <option key={s.value} value={s.value} className="bg-[#15171E]">
+                  <option key={s.value} value={s.value} className="bg-[#16181F]">
                     {s.label}
                   </option>
                 ))}
@@ -322,10 +322,10 @@ export default function Explore() {
               <select
                 value={selectedYear}
                 onChange={(e) => updateFilterParam('year', e.target.value)}
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
               >
                 {YEARS.map((y) => (
-                  <option key={y} value={y} className="bg-[#15171E]">
+                  <option key={y} value={y} className="bg-[#16181F]">
                     {y === 'All' ? 'All Years' : y}
                   </option>
                 ))}
@@ -338,10 +338,10 @@ export default function Explore() {
               <select
                 value={selectedMinScore}
                 onChange={(e) => updateFilterParam('minScore', e.target.value)}
-                className="w-full bg-[#15171E] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
+                className="w-full bg-[#16181F] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer focus:border-[#E2E8F0] transition-colors"
               >
                 {MIN_SCORES.map((sc) => (
-                  <option key={sc.value} value={sc.value} className="bg-[#15171E]">
+                  <option key={sc.value} value={sc.value} className="bg-[#16181F]">
                     {sc.label}
                   </option>
                 ))}
@@ -360,7 +360,7 @@ export default function Explore() {
                   className={`flex-none px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     selectedGenre === g
                       ? 'bg-[#E2E8F0] text-black font-bold shadow-sm'
-                      : 'bg-[#15171E] text-[#94A3B8] hover:text-white border border-white/5 hover:border-white/20'
+                      : 'bg-[#16181F] text-[#94A3B8] hover:text-white border border-white/5 hover:border-white/20'
                   }`}
                 >
                   {g}
@@ -373,12 +373,12 @@ export default function Explore() {
 
       {/* 3. Active Filters Chips & Reset Row */}
       {activeFilterCount > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-[#111318]/60 p-3 rounded-xl border border-white/5">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-[#0F1115]/60 p-3 rounded-xl border border-white/5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-[#94A3B8] font-semibold">Active Filters:</span>
 
             {query.trim() && (
-              <span className="flex items-center gap-1.5 bg-[#15171E] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1.5 bg-[#16181F] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
                 <span>"{query.trim()}"</span>
                 <button onClick={handleClearQuery} className="hover:text-red-400">
                   <X className="w-3 h-3" />
@@ -387,7 +387,7 @@ export default function Explore() {
             )}
 
             {selectedGenre !== 'All' && (
-              <span className="flex items-center gap-1.5 bg-[#15171E] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1.5 bg-[#16181F] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
                 <span>Genre: {selectedGenre}</span>
                 <button onClick={() => updateFilterParam('genre', 'All')} className="hover:text-red-400">
                   <X className="w-3 h-3" />
@@ -396,7 +396,7 @@ export default function Explore() {
             )}
 
             {selectedFormat !== 'All' && (
-              <span className="flex items-center gap-1.5 bg-[#15171E] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1.5 bg-[#16181F] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
                 <span>Format: {selectedFormat}</span>
                 <button onClick={() => updateFilterParam('format', 'All')} className="hover:text-red-400">
                   <X className="w-3 h-3" />
@@ -405,7 +405,7 @@ export default function Explore() {
             )}
 
             {selectedStatus !== 'All' && (
-              <span className="flex items-center gap-1.5 bg-[#15171E] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1.5 bg-[#16181F] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
                 <span>Status: {STATUSES.find((s) => s.value === selectedStatus)?.label || selectedStatus}</span>
                 <button onClick={() => updateFilterParam('status', 'All')} className="hover:text-red-400">
                   <X className="w-3 h-3" />
@@ -414,7 +414,7 @@ export default function Explore() {
             )}
 
             {selectedYear !== 'All' && (
-              <span className="flex items-center gap-1.5 bg-[#15171E] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1.5 bg-[#16181F] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
                 <span>Year: {selectedYear}</span>
                 <button onClick={() => updateFilterParam('year', 'All')} className="hover:text-red-400">
                   <X className="w-3 h-3" />
@@ -423,7 +423,7 @@ export default function Explore() {
             )}
 
             {selectedMinScore !== 'All' && (
-              <span className="flex items-center gap-1.5 bg-[#15171E] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1.5 bg-[#16181F] border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg">
                 <span>Score: {selectedMinScore}+</span>
                 <button onClick={() => updateFilterParam('minScore', 'All')} className="hover:text-red-400">
                   <X className="w-3 h-3" />
@@ -448,7 +448,7 @@ export default function Explore() {
           {Array.from({ length: 14 }).map((_, i) => (
             <div
               key={i}
-              className="aspect-[2/3] rounded-2xl bg-[#15171E] animate-pulse border border-white/5"
+              className="aspect-[2/3] rounded-2xl bg-[#16181F] animate-pulse border border-white/5"
             />
           ))}
         </div>
@@ -472,7 +472,7 @@ export default function Explore() {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="flex items-center gap-2 bg-[#15171E] hover:bg-white hover:text-black border border-white/10 hover:border-white text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 text-sm"
+                className="flex items-center gap-2 bg-[#16181F] hover:bg-white hover:text-black border border-white/10 hover:border-white text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 text-sm"
               >
                 {loadingMore ? (
                   <>
@@ -490,9 +490,9 @@ export default function Explore() {
           )}
         </div>
       ) : (
-        <div className="py-20 text-center space-y-3 bg-[#111318] rounded-3xl border border-white/5 p-8 max-w-xl mx-auto">
+        <div className="py-20 text-center space-y-3 bg-[#0F1115] rounded-3xl border border-white/5 p-8 max-w-xl mx-auto">
           <p className="text-lg text-white font-bold">No anime found matching your filters.</p>
-          <p className="text-xs text-[#AAA2B7] max-w-sm mx-auto">
+          <p className="text-xs text-[#94A3B8] max-w-sm mx-auto">
             Try adjusting your format, year, or score requirements to see more titles.
           </p>
           <button

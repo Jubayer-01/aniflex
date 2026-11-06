@@ -50,7 +50,7 @@ export default function SearchBar({ isOpen, onClose }) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="w-full max-w-2xl bg-[#111318] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+        className="w-full max-w-2xl bg-[#0F1115] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Search Input Bar (Form with Enter & Button Submit) */}
         <form onSubmit={handleSearchSubmit} className="flex items-center px-4 py-3.5 border-b border-white/10 gap-3">
@@ -67,14 +67,14 @@ export default function SearchBar({ isOpen, onClose }) {
               }
             }}
             placeholder="Search anime title (e.g. Naruto, Bleach, Solo Leveling)..."
-            className="flex-1 bg-transparent text-white placeholder-[#AAA2B7] text-base outline-none"
+            className="flex-1 bg-transparent text-white placeholder-[#94A3B8] text-base outline-none"
           />
           {loading && <Loader2 className="w-5 h-5 text-[#94A3B8] animate-spin flex-none" />}
           {query && !loading && (
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="text-[#AAA2B7] hover:text-white p-1"
+              className="text-[#94A3B8] hover:text-white p-1"
             >
               <X className="w-4 h-4" />
             </button>
@@ -97,7 +97,7 @@ export default function SearchBar({ isOpen, onClose }) {
 
         {/* Quick Suggestion Pills */}
         <div className="px-4 py-2.5 bg-[#060709]/50 flex items-center gap-2 overflow-x-auto text-xs no-scrollbar border-b border-white/5">
-          <span className="text-[#AAA2B7] font-semibold flex-none">Popular Tags:</span>
+          <span className="text-[#94A3B8] font-semibold flex-none">Popular Tags:</span>
           {quickGenres.map((g) => (
             <button
               key={g}
@@ -135,7 +135,7 @@ export default function SearchBar({ isOpen, onClose }) {
                       <h4 className="font-bold text-sm text-white group-hover:text-[#E2E8F0] transition-colors line-clamp-1">
                         {title}
                       </h4>
-                      <p className="text-xs text-[#AAA2B7]">
+                      <p className="text-xs text-[#94A3B8]">
                         {anime.seasonYear || 'Anime'} • {anime.format || 'TV'}
                       </p>
                     </div>
@@ -157,12 +157,12 @@ export default function SearchBar({ isOpen, onClose }) {
             })
           ) : query ? (
             !loading && (
-              <div className="p-8 text-center text-sm text-[#AAA2B7]">
+              <div className="p-8 text-center text-sm text-[#94A3B8]">
                 No anime found matching "<span className="text-white font-medium">{query}</span>"
               </div>
             )
           ) : (
-            <div className="p-8 text-center text-xs text-[#AAA2B7]">
+            <div className="p-8 text-center text-xs text-[#94A3B8]">
               Search live titles across upto 20,000+ Anime.
             </div>
           )}
@@ -172,7 +172,7 @@ export default function SearchBar({ isOpen, onClose }) {
         {query.trim() && (
           <button
             onClick={handleSearchSubmit}
-            className="w-full p-3 bg-[#15171E] hover:bg-white/10 border-t border-white/10 text-center text-xs font-semibold text-gray-300 hover:text-white cursor-pointer flex items-center justify-center gap-2 transition-colors"
+            className="w-full p-3 bg-[#16181F] hover:bg-white/10 border-t border-white/10 text-center text-xs font-semibold text-gray-300 hover:text-white cursor-pointer flex items-center justify-center gap-2 transition-colors"
           >
             <span>View all results for "{query.trim()}" on Search Page</span>
             <ArrowRight className="w-3.5 h-3.5" />

@@ -17,11 +17,11 @@ export default function Footer() {
                 Omni<span className="text-[#94A3B8]">Flex</span>
               </span>
             </div>
-            <p className="text-xs text-[#AAA2B7]">Universal Movies, Series & Anime.</p>
+            <p className="text-xs text-[#94A3B8]">Universal Movies, Series & Anime.</p>
           </div>
 
           {/* Links */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#AAA2B7]">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#94A3B8]">
             <Link to="/about" className="hover:text-white transition-colors">About</Link>
             <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
@@ -29,7 +29,7 @@ export default function Footer() {
           </div>
 
           {/* Social Icons matching the mockup */}
-          <div className="flex items-center gap-4 text-[#AAA2B7]">
+          <div className="flex items-center gap-4 text-[#94A3B8]">
             {/* Discord */}
             <a href="https://discord.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-6 text-center text-xs text-[#AAA2B7]/60">
+        <div className="pt-6 text-center text-xs text-[#94A3B8]/60">
           © {new Date().getFullYear()} OmniFlex. For demo, personal and educational purposes. All media and trademarks belong to their respective creators.
         </div>
       </div>

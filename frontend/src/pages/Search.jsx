@@ -189,7 +189,7 @@ export default function Search() {
 
           {/* Quick Popular Tags */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2">
-            <span className="text-xs font-bold text-[#AAA2B7] flex items-center gap-1 flex-none uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#94A3B8] flex items-center gap-1 flex-none uppercase tracking-wider">
               <TrendingUp className="w-3.5 h-3.5 text-[#94A3B8]" />
               <span>Trending:</span>
             </span>
@@ -200,7 +200,7 @@ export default function Search() {
                 className={`flex-none px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                   query.toLowerCase() === tag.toLowerCase()
                     ? 'bg-[#E2E8F0] text-black border-[#E2E8F0] shadow-sm'
-                    : 'bg-[#111318] border-white/10 text-gray-300 hover:text-white hover:border-white/30 hover:bg-white/5'
+                    : 'bg-[#0F1115] border-white/10 text-gray-300 hover:text-white hover:border-white/30 hover:bg-white/5'
                 }`}
               >
                 {tag}
@@ -229,7 +229,7 @@ export default function Search() {
             )}
           </div>
 
-          <span className="text-xs font-bold text-[#AAA2B7] font-mono bg-white/5 px-3 py-1 rounded-full border border-white/10">
+          <span className="text-xs font-bold text-[#94A3B8] font-mono bg-white/5 px-3 py-1 rounded-full border border-white/10">
             {displayList.length} {displayList.length === 1 ? 'Anime' : 'Animes'}
           </span>
         </div>
@@ -250,13 +250,13 @@ export default function Search() {
         ) : (
           !loading && isSearching && (
             <div className="py-20 text-center space-y-3">
-              <div className="w-16 h-16 rounded-3xl bg-[#15171E] border border-white/10 flex items-center justify-center mx-auto text-[#94A3B8] shadow-2xl">
+              <div className="w-16 h-16 rounded-3xl bg-[#16181F] border border-white/10 flex items-center justify-center mx-auto text-[#94A3B8] shadow-2xl">
                 <SearchIcon className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-black text-white">
                 No anime found matching "{query}"
               </h3>
-              <p className="text-sm text-[#AAA2B7] max-w-md mx-auto">
+              <p className="text-sm text-[#94A3B8] max-w-md mx-auto">
                 Check your spelling, or try searching with another keyword, character name, or official Romaji title.
               </p>
             </div>
