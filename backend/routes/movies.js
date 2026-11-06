@@ -33,7 +33,7 @@ function setCached(key, data) {
 const isValidNumericId = (val) => /^\d+$/.test(String(val));
 
 function validatePage(req, res) {
-  if (req.query.page !== undefined) {
+  if (req?.query?.page !== undefined) {
     if (!/^\d+$/.test(String(req.query.page)) || Number(req.query.page) < 1) {
       res.status(400).json({ error: 'Invalid page parameter. Must be a positive integer' });
       return false;

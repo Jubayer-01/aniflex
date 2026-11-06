@@ -6,15 +6,15 @@ const router = express.Router();
 
 // GET /api/anime (Browse & filter catalog)
 router.get('/', async (req, res) => {
-  const { genre, sort = 'score', search, limit = 24, page = 1 } = req.query;
+  const { genre, sort = 'score', search, limit = 24, page = 1 } = req.query || {};
 
-  if (req.query.limit !== undefined) {
+  if (req.query?.limit !== undefined) {
     if (!/^\d+$/.test(String(limit)) || Number(limit) < 1 || Number(limit) > 100) {
       return res.status(400).json({ error: 'Invalid limit parameter. Must be an integer between 1 and 100' });
     }
   }
 
-  if (req.query.page !== undefined) {
+  if (req.query?.page !== undefined) {
     if (!/^\d+$/.test(String(page)) || Number(page) < 1) {
       return res.status(400).json({ error: 'Invalid page parameter. Must be a positive integer' });
     }

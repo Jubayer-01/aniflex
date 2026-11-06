@@ -9,9 +9,9 @@ router.use(authenticateToken);
 
 // GET /api/history (Get user's continue-watching history - decoupled from local tables)
 router.get('/', async (req, res) => {
-  const { limit = 20 } = req.query;
+  const { limit = 20 } = req.query || {};
 
-  if (req.query.limit !== undefined) {
+  if (req.query?.limit !== undefined) {
     if (!/^\d+$/.test(String(limit)) || Number(limit) < 1 || Number(limit) > 100) {
       return res.status(400).json({ error: 'Invalid limit parameter. Must be an integer between 1 and 100' });
     }
