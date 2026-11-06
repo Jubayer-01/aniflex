@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Lighthouse audits
+lighthouse-report*
+lighthouse-preview*

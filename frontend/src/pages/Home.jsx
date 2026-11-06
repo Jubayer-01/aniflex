@@ -144,13 +144,26 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-[#060709] text-white overflow-x-hidden font-sans">
-      {/* 1. Master Omni Hero Spotlight */}
-      {heroItems.length > 0 && (
+      {/* 1. Master Omni Hero Spotlight (Zero CLS with matched skeleton) */}
+      {heroItems.length > 0 ? (
         <Hero
           anime={heroItems[0]}
           items={heroItems}
           onOpenDetails={handlePlayMedia}
         />
+      ) : (
+        <div className="relative w-full h-[75vh] min-h-[580px] max-h-[820px] bg-[#060709] flex items-end pb-12 sm:pb-16 lg:pb-20 pt-16 px-4 sm:px-6 md:px-10 lg:px-12 animate-pulse border-b border-white/5">
+          <div className="space-y-4 max-w-2xl w-full">
+            <div className="w-28 h-6 rounded-full bg-white/10" />
+            <div className="w-3/4 h-12 rounded-xl bg-white/10" />
+            <div className="w-1/2 h-4 rounded-lg bg-white/5" />
+            <div className="w-full h-16 rounded-xl bg-white/5" />
+            <div className="flex gap-3 pt-2">
+              <div className="w-32 h-10 rounded-full bg-white/15" />
+              <div className="w-32 h-10 rounded-full bg-white/10" />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* 2. Main Entertainment Shelves */}

@@ -82,6 +82,7 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
             src={banner}
             alt={title}
             loading="eager"
+            fetchpriority="high"
             decoding="async"
             className="w-full h-full object-cover object-[center_20%] lg:object-[center_15%] filter brightness-[0.85] transition-all duration-700"
           />

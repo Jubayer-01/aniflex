@@ -151,13 +151,14 @@ export default function Series() {
 
   return (
     <div className="min-h-screen bg-[#060709] text-white pt-24 pb-16 font-sans">
-      {/* 1. Cinematic Spotlight Banner */}
-      {heroSeries && (
+      {/* 1. Cinematic Spotlight Banner (Zero CLS with matched skeleton) */}
+      {heroSeries ? (
         <section className="relative w-full h-[55vh] min-h-[420px] max-h-[600px] overflow-hidden -mt-24 mb-10">
           <img
             src={getTMDBImageUrl(heroSeries.backdrop_path, 'w1280')}
             alt={heroSeries.name}
             loading="eager"
+            fetchpriority="high"
             decoding="async"
             className="w-full h-full object-cover object-top filter brightness-75 scale-105"
           />
@@ -204,6 +205,8 @@ export default function Series() {
             </div>
           </div>
         </section>
+      ) : (
+        <div className="relative w-full h-[55vh] min-h-[420px] max-h-[600px] -mt-24 mb-10 bg-[#060709] animate-pulse border-b border-white/5" />
       )}
 
       {/* 2. Category Filter Navigation */}
