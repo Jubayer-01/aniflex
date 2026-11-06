@@ -27,32 +27,30 @@ export default function Series() {
   const [genreSeries, setGenreSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(3);
+  const [page, setPage] = useState(2);
   const [genrePage, setGenrePage] = useState(1);
 
-  // Multi-page batch loader on mount (fetches pages 1, 2, and 3 concurrently)
+  // Initial catalog loader (fetches pages 1 and 2 concurrently for fast initial paint)
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
 
     async function loadSeriesCatalogs() {
       try {
-        const [s1, s2, s3, k1, k2, k3] = await Promise.all([
+        const [s1, s2, k1, k2] = await Promise.all([
           getPopularSeries(1),
           getPopularSeries(2),
-          getPopularSeries(3),
           getKDramas(1),
           getKDramas(2),
-          getKDramas(3),
         ]);
 
         if (!isMounted) return;
-        const allSeries = [...s1, ...s2, ...s3];
-        const allKdramas = [...k1, ...k2, ...k3];
+        const allSeries = [...s1, ...s2];
+        const allKdramas = [...k1, ...k2];
 
         setSeriesList(allSeries);
         setKdramaList(allKdramas);
-        setPage(3);
+        setPage(2);
       } catch (err) {
         console.error('Series catalog fetch error:', err);
       } finally {
@@ -157,8 +155,10 @@ export default function Series() {
       {heroSeries && (
         <section className="relative w-full h-[55vh] min-h-[420px] max-h-[600px] overflow-hidden -mt-24 mb-10">
           <img
-            src={getTMDBImageUrl(heroSeries.backdrop_path, 'original')}
+            src={getTMDBImageUrl(heroSeries.backdrop_path, 'w1280')}
             alt={heroSeries.name}
+            loading="eager"
+            decoding="async"
             className="w-full h-full object-cover object-top filter brightness-75 scale-105"
           />
           {/* Gradient Overlays */}
@@ -225,11 +225,10 @@ export default function Series() {
               <button
                 key={cat.id}
                 onClick={() => setActiveTab(cat.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                  activeTab === cat.id
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${activeTab === cat.id
                     ? 'bg-[#E2E8F0] text-black shadow-md font-bold scale-105'
                     : 'bg-[#16181F] text-[#94A3B8] hover:text-white hover:bg-white/10 border border-white/10'
-                }`}
+                  }`}
               >
                 {cat.label}
               </button>
@@ -289,9 +288,7 @@ export default function Series() {
                   </>
                 )}
               </button>
-              <p className="text-xs text-[#94A3B8]/70 font-mono">
-                Showing {displayedSeries.length} TV series from TMDB catalog
-              </p>
+
             </div>
           </>
         )}

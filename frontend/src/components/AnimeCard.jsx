@@ -11,12 +11,12 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
       : anime.title?.english || anime.title?.romaji || anime.title?.native || anime.name || 'Untitled';
 
   const cover =
-    anime.coverImage?.extraLarge ||
     anime.coverImage?.large ||
+    anime.coverImage?.extraLarge ||
     anime.coverImage?.medium ||
-    (anime.poster_path ? `https://image.tmdb.org/t/p/w500${anime.poster_path}` : null) ||
+    (anime.poster_path ? `https://image.tmdb.org/t/p/w342${anime.poster_path}` : null) ||
     anime.poster_url ||
-    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=60';
+    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=342&auto=format&fit=crop&q=60';
 
   const score = anime.averageScore
     ? (anime.averageScore / 10).toFixed(1)
@@ -53,6 +53,7 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
         src={cover}
         alt={title}
         loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
 

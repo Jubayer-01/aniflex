@@ -28,32 +28,30 @@ export default function Movies() {
   const [genreMovies, setGenreMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(3);
+  const [page, setPage] = useState(2);
   const [genrePage, setGenrePage] = useState(1);
 
-  // Multi-page batch loader on mount (fetches pages 1, 2, and 3 concurrently)
+  // Initial catalog loader (fetches pages 1 and 2 concurrently for fast initial paint)
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
 
     async function loadMovieCatalogs() {
       try {
-        const [hw1, hw2, hw3, bw1, bw2, bw3] = await Promise.all([
+        const [hw1, hw2, bw1, bw2] = await Promise.all([
           getHollywoodMovies(1),
           getHollywoodMovies(2),
-          getHollywoodMovies(3),
           getBollywoodMovies(1),
           getBollywoodMovies(2),
-          getBollywoodMovies(3),
         ]);
 
         if (!isMounted) return;
-        const allHollywood = [...hw1, ...hw2, ...hw3];
-        const allBollywood = [...bw1, ...bw2, ...bw3];
+        const allHollywood = [...hw1, ...hw2];
+        const allBollywood = [...bw1, ...bw2];
 
         setHollywoodList(allHollywood);
         setBollywoodList(allBollywood);
-        setPage(3);
+        setPage(2);
       } catch (err) {
         console.error('Movies catalog fetch error:', err);
       } finally {
@@ -169,8 +167,10 @@ export default function Movies() {
       {heroMovie && (
         <section className="relative w-full h-[55vh] min-h-[420px] max-h-[600px] overflow-hidden -mt-24 mb-10">
           <img
-            src={getTMDBImageUrl(heroMovie.backdrop_path, 'original')}
+            src={getTMDBImageUrl(heroMovie.backdrop_path, 'w1280')}
             alt={heroMovie.title}
+            loading="eager"
+            decoding="async"
             className="w-full h-full object-cover object-top filter brightness-75 scale-105"
           />
           {/* Gradient Overlays */}
@@ -237,11 +237,10 @@ export default function Movies() {
               <button
                 key={cat.id}
                 onClick={() => setActiveTab(cat.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                  activeTab === cat.id
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${activeTab === cat.id
                     ? 'bg-[#E2E8F0] text-black shadow-md font-bold scale-105'
                     : 'bg-[#16181F] text-[#94A3B8] hover:text-white hover:bg-white/10 border border-white/5'
-                }`}
+                  }`}
               >
                 {cat.label}
               </button>
@@ -301,9 +300,6 @@ export default function Movies() {
                   </>
                 )}
               </button>
-              <p className="text-xs text-[#94A3B8]/70 font-mono">
-                Showing {displayedMovies.length} movies from TMDB cinema catalog
-              </p>
             </div>
           </>
         )}

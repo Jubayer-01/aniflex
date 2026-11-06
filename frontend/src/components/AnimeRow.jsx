@@ -8,13 +8,18 @@ export default function AnimeRow({ title, items = [], loading = false, seeAllLin
   const navigate = useNavigate();
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const scrollRaf = useRef(null);
 
   const checkScroll = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 20);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 20);
-    }
+    if (scrollRaf.current) return;
+    scrollRaf.current = requestAnimationFrame(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        setCanScrollLeft(scrollLeft > 20);
+        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 20);
+      }
+      scrollRaf.current = null;
+    });
   };
 
   const scroll = (direction) => {

@@ -5,13 +5,46 @@ const TMDB_DIRECT_KEY = import.meta.env.VITE_TMDB_API_KEY || '4c42c5afcf57e49501
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
 
-// TMDB Image Helper (Images are hosted on public CDN, zero API key required)
-export function getTMDBImageUrl(path, size = 'w500') {
-  if (!path) return 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=60';
-  return `${IMAGE_BASE_URL}/${size}${path}`;
+// 1. High-Performance In-Memory + SessionStorage Cache (10-minute TTL)
+const cache = new Map();
+const CACHE_TTL_MS = 10 * 60 * 1000;
+
+function getCached(key) {
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.timestamp < CACHE_TTL_MS) {
+    return hit.data;
+  }
+  try {
+    const raw = sessionStorage.getItem(`tmdb_cache_${key}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
+        cache.set(key, parsed);
+        return parsed.data;
+      }
+    }
+  } catch {}
+  return null;
 }
 
-// Direct TMDB fallback fetcher when backend proxy is sleeping or unavailable
+function setCached(key, data) {
+  if (!data) return;
+  const entry = { data, timestamp: Date.now() };
+  cache.set(key, entry);
+  try {
+    sessionStorage.setItem(`tmdb_cache_${key}`, JSON.stringify(entry));
+  } catch {}
+}
+
+// 2. Optimized Image Helper: Defaults to w342 for cards, w1280 for banners (Zero 4K bandwidth waste)
+export function getTMDBImageUrl(path, size = 'w342') {
+  if (!path) return 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&auto=format&fit=crop&q=60';
+  // Normalize 'original' to 'w1280' on mobile/tablets to prevent memory crashes
+  const safeSize = size === 'original' && typeof window !== 'undefined' && window.innerWidth < 1920 ? 'w1280' : size;
+  return `${IMAGE_BASE_URL}/${safeSize}${path}`;
+}
+
+// 3. Direct TMDB fetcher with 3-second timeout
 async function fetchDirectTMDB(endpoint, params = {}) {
   try {
     const res = await axios.get(`${TMDB_BASE_URL}${endpoint}`, {
@@ -20,33 +53,44 @@ async function fetchDirectTMDB(endpoint, params = {}) {
         language: 'en-US',
         ...params,
       },
-      timeout: 5000,
+      timeout: 3500,
     });
     return res.data;
   } catch (err) {
-    console.warn(`Direct TMDB fallback failed [${endpoint}]:`, err.message);
+    console.warn(`Direct TMDB fallback warning [${endpoint}]:`, err.message);
     return null;
   }
 }
 
-// Resilient fetch helper: tries production backend proxy first, seamlessly falls back to direct TMDB
+// 4. Resilient & Cached fetch helper: 0ms cache hits -> fast proxy (2s timeout) -> direct TMDB
 async function fetchProxy(endpoint, directEndpoint, params = {}, directParams = null) {
+  const cacheKey = `${endpoint}_${JSON.stringify(params || {})}`;
+  const hit = getCached(cacheKey);
+  if (hit) return hit;
+
+  let resultData = null;
+
   try {
     const response = await axios.get(`${API_BASE_URL}/movies${endpoint}`, {
       params,
-      timeout: 4000,
+      timeout: 2200, // Reduced from 4000ms to 2200ms to prevent lag on slow networks
     });
     if (response.data && (response.data.results || response.data.id || response.data.episodes)) {
-      return response.data;
+      resultData = response.data;
     }
-  } catch (error) {
-    // Backend proxy unavailable, cold-starting, or rate-limited; trigger direct TMDB fallback
-    console.info(`Proxy unavailable for ${endpoint}, switching to direct TMDB connection...`);
+  } catch {
+    // Fail fast to direct TMDB
   }
 
-  // Layer 2: Direct TMDB Fallback
-  const fallbackData = await fetchDirectTMDB(directEndpoint || endpoint, directParams || params);
-  return fallbackData;
+  if (!resultData) {
+    resultData = await fetchDirectTMDB(directEndpoint || endpoint, directParams || params);
+  }
+
+  if (resultData) {
+    setCached(cacheKey, resultData);
+  }
+
+  return resultData;
 }
 
 // 1. Trending All (Movies + TV) for Omni Home

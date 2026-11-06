@@ -69,23 +69,26 @@ export default function Home() {
     async function loadOmniData() {
       try {
         setLoading(true);
-        const [omniTrending, hw1, hw2, bw1, bw2, tv1, tv2, animeCatalog] = await Promise.all([
+        const [omniRes, hwRes, bwRes, tvRes, animeRes] = await Promise.allSettled([
           getTrendingAll(),
           getHollywoodMovies(1),
-          getHollywoodMovies(2),
           getBollywoodMovies(1),
-          getBollywoodMovies(2),
           getPopularSeries(1),
-          getPopularSeries(2),
           getHomePageCatalog(false),
         ]);
 
         if (!isMounted) return;
 
+        const omniTrending = omniRes.status === 'fulfilled' ? omniRes.value : [];
+        const hw1 = hwRes.status === 'fulfilled' ? hwRes.value : [];
+        const bw1 = bwRes.status === 'fulfilled' ? bwRes.value : [];
+        const tv1 = tvRes.status === 'fulfilled' ? tvRes.value : [];
+        const animeCatalog = animeRes.status === 'fulfilled' ? animeRes.value : null;
+
         setTrendingAll(omniTrending || []);
-        setHollywoodMovies([...(hw1 || []), ...(hw2 || [])]);
-        setBollywoodMovies([...(bw1 || []), ...(bw2 || [])]);
-        setTvSeries([...(tv1 || []), ...(tv2 || [])]);
+        setHollywoodMovies(hw1 || []);
+        setBollywoodMovies(bw1 || []);
+        setTvSeries(tv1 || []);
 
         const topAnime = animeCatalog?.trending || [];
         setAnimeList(topAnime);
@@ -94,8 +97,8 @@ export default function Home() {
         const movieTvHeroes = (omniTrending || []).slice(0, 6).map((m) => ({
           id: m.id,
           title: { english: m.title || m.name, romaji: m.original_title || m.original_name },
-          bannerImage: getTMDBImageUrl(m.backdrop_path, 'original'),
-          coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w500') },
+          bannerImage: getTMDBImageUrl(m.backdrop_path, 'w1280'),
+          coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w342') },
           score: m.vote_average ? m.vote_average.toFixed(1) : '8.5',
           year: m.release_date?.slice(0, 4) || m.first_air_date?.slice(0, 4) || '2026',
           description: m.overview,

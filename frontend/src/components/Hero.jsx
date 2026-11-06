@@ -77,18 +77,12 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="absolute inset-0 z-0 bg-[#060709]"
         >
-          {/* Ambient blurred backdrop layer */}
-          <img
-            src={banner}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-20 filter brightness-50 pointer-events-none"
-          />
-
           {/* Crisp Widescreen Foreground Banner */}
           <img
             src={banner}
             alt={title}
+            loading="eager"
+            decoding="async"
             className="w-full h-full object-cover object-[center_20%] lg:object-[center_15%] filter brightness-[0.85] transition-all duration-700"
           />
 
