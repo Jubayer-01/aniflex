@@ -606,7 +606,7 @@ export default function Watch() {
                     : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  Server 1 (HD Stream)
+                  Server 1 (Direct Stream)
                 </button>
                 <button
                   onClick={() => setStreamServer('server2')}
@@ -615,7 +615,7 @@ export default function Watch() {
                     : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  Server 2 (Backup Node)
+                  Server 2 (HD Node)
                 </button>
                 <button
                   onClick={() => setStreamServer('server3')}
@@ -624,7 +624,7 @@ export default function Watch() {
                     : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  Server 3 (Alt Stream)
+                  Server 3 (Backup Node)
                 </button>
               </div>
 
@@ -692,10 +692,10 @@ export default function Watch() {
                 key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}-${reloadKey}`}
                 src={
                   streamServer === 'server3'
-                    ? `https://www.2embed.skin/embed/ani/${id || 101922}/${currentEpData.number}`
+                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=2&autoPlay=1&accent=8955EF`
                     : streamServer === 'server2'
-                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=2&autoPlay=0&autoSkip=0&accent=8955EF`
-                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=0&accent=8955EF`
+                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=1&accent=8955EF`
+                    : `https://www.2embed.skin/embed/ani/${id || 101922}/${currentEpData.number}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
@@ -764,9 +764,9 @@ export default function Watch() {
                     ? `https://vidlink.pro/movie/${id}`
                     : mediaType === 'tv'
                     ? `https://vidlink.pro/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                    : streamServer === 'server3'
+                    : streamServer === 'server1'
                     ? `https://www.2embed.skin/embed/ani/${id || 101922}/${currentEpData.number}`
-                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server2' ? '2' : '1'}&autoPlay=1`
+                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=${streamServer === 'server3' ? '2' : '1'}&autoPlay=1`
                 }
                 target="_blank"
                 rel="noreferrer"
