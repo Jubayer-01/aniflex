@@ -180,8 +180,8 @@ export default function Movies() {
           {/* Hero Content */}
           <div className="absolute bottom-12 left-0 right-0 w-full px-4 sm:px-6 md:px-10 lg:px-12 z-20">
             <div className="max-w-2xl space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/20 border border-red-500/30 text-red-400 text-xs font-bold tracking-wider uppercase">
-                <Clapperboard className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[#E2E8F0] text-xs font-bold tracking-wider uppercase backdrop-blur-md">
+                <Clapperboard className="w-3.5 h-3.5 text-[#E2E8F0]" />
                 <span>Featured Premiere</span>
               </div>
 
@@ -207,7 +207,7 @@ export default function Movies() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => handlePlayMovie(heroMovie)}
-                  className="flex items-center gap-2.5 px-6 py-3 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
+                  className="flex items-center gap-2.5 px-6 py-2.5 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-full text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-black text-black" />
                   <span>Watch Movie</span>
@@ -287,7 +287,7 @@ export default function Movies() {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-8 py-3.5 bg-[#16181F] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-2xl border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="px-8 py-3 bg-[#16181F] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-full border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 {loadingMore ? (
                   <>

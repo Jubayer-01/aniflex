@@ -168,8 +168,8 @@ export default function Series() {
           {/* Hero Content */}
           <div className="absolute bottom-12 left-0 right-0 w-full px-4 sm:px-6 md:px-10 lg:px-12 z-20">
             <div className="max-w-2xl space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-xs font-bold tracking-wider uppercase">
-                <Tv className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[#E2E8F0] text-xs font-bold tracking-wider uppercase backdrop-blur-md">
+                <Tv className="w-3.5 h-3.5 text-[#E2E8F0]" />
                 <span>Featured TV Series</span>
               </div>
 
@@ -195,7 +195,7 @@ export default function Series() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => handlePlaySeries(heroSeries)}
-                  className="flex items-center gap-2.5 px-6 py-3 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-xl text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
+                  className="flex items-center gap-2.5 px-6 py-2.5 bg-[#E2E8F0] hover:bg-white text-black font-bold rounded-full text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-black text-black" />
                   <span>Start Season 1</span>
@@ -211,7 +211,7 @@ export default function Series() {
         <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4 flex-wrap">
           <div>
             <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
-              <Tv className="w-6 h-6 text-indigo-400" />
+              <Tv className="w-6 h-6 text-[#E2E8F0]" />
               <span>TV Series & Shows</span>
             </h2>
             <p className="text-xs text-[#94A3B8] mt-1">
@@ -227,8 +227,8 @@ export default function Series() {
                 onClick={() => setActiveTab(cat.id)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === cat.id
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105'
-                    : 'bg-[#16181F] text-[#94A3B8] hover:text-white hover:bg-white/10 border border-white/5'
+                    ? 'bg-[#E2E8F0] text-black shadow-md font-bold scale-105'
+                    : 'bg-[#16181F] text-[#94A3B8] hover:text-white hover:bg-white/10 border border-white/10'
                 }`}
               >
                 {cat.label}
@@ -275,16 +275,16 @@ export default function Series() {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-8 py-3.5 bg-[#16181F] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-2xl border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="px-8 py-3 bg-[#16181F] hover:bg-white hover:text-black text-white font-bold text-xs sm:text-sm rounded-full border border-white/10 hover:border-white shadow-xl transition-all duration-300 flex items-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 {loadingMore ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#E2E8F0]" />
                     <span>Fetching more TV series...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 text-indigo-400" />
+                    <Sparkles className="w-4 h-4 text-[#E2E8F0]" />
                     <span>Load More Series</span>
                   </>
                 )}
