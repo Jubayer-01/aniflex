@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AnimeRow from '../../components/AnimeRow';
 import NotFound from '../NotFound';
@@ -6,7 +6,7 @@ import { getMovieDetails, getTMDBImageUrl } from '../../services/tmdbService';
 import { saveWatchProgress } from '../../services/watchHistoryService';
 import {
   ThumbsUp, ThumbsDown, Bookmark, Check, Share2, ArrowLeft,
-  Star, Play, RotateCcw
+  Star, Play, RotateCcw, Maximize, Minimize
 } from 'lucide-react';
 
 const EMBED_SERVERS = [
@@ -29,6 +29,33 @@ export default function WatchMovie() {
   const [likes, setLikes] = useState(5420);
   const [dislikes, setDislikes] = useState(84);
   const [userReaction, setUserReaction] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const playerContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!playerContainerRef.current) return;
+    if (!document.fullscreenElement) {
+      if (playerContainerRef.current.requestFullscreen) {
+        playerContainerRef.current.requestFullscreen().catch(() => {});
+      } else if (playerContainerRef.current.webkitRequestFullscreen) {
+        playerContainerRef.current.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -193,7 +220,10 @@ export default function WatchMovie() {
           )}
 
           {/* Video Player Display */}
-          <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+          <div
+            ref={playerContainerRef}
+            className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+          >
             <iframe
               key={`movie-${id}-${streamServer}-${reloadKey}`}
               src={
@@ -201,8 +231,10 @@ export default function WatchMovie() {
               }
               className="w-full h-full border-0"
               allowFullScreen
+              webkitallowfullscreen="true"
+              mozallowfullscreen="true"
               referrerPolicy="no-referrer"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allow="accelerometer; autoplay *; clipboard-write *; encrypted-media *; gyroscope; picture-in-picture *; fullscreen *"
               title={`${movie.title} - Full Movie`}
             />
           </div>
@@ -218,6 +250,14 @@ export default function WatchMovie() {
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reload</span>
+              </button>
+              <button
+                onClick={toggleFullscreen}
+                className="inline-flex items-center gap-1 text-[#94A3B8] hover:text-white transition-colors cursor-pointer"
+                title="Toggle Fullscreen"
+              >
+                {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
+                <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
               </button>
             </div>
 

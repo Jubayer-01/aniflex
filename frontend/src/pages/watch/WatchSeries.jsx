@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import AnimeRow from '../../components/AnimeRow';
 import NotFound from '../NotFound';
@@ -7,7 +7,7 @@ import { saveWatchProgress, getLastWatchedEpisode } from '../../services/watchHi
 import {
   ThumbsUp, ThumbsDown, Bookmark, Check, Share2, ArrowLeft,
   Star, Play, Tv, ChevronDown, ChevronUp, RotateCcw,
-  SkipBack, SkipForward
+  SkipBack, SkipForward, Maximize, Minimize
 } from 'lucide-react';
 
 const TV_EMBED_SERVERS = [
@@ -42,6 +42,33 @@ export default function WatchSeries() {
   const [likes, setLikes] = useState(7890);
   const [dislikes, setDislikes] = useState(115);
   const [userReaction, setUserReaction] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const playerContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!playerContainerRef.current) return;
+    if (!document.fullscreenElement) {
+      if (playerContainerRef.current.requestFullscreen) {
+        playerContainerRef.current.requestFullscreen().catch(() => {});
+      } else if (playerContainerRef.current.webkitRequestFullscreen) {
+        playerContainerRef.current.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  };
 
   // Initial Series Metadata Fetch
   useEffect(() => {
@@ -244,7 +271,10 @@ export default function WatchSeries() {
           </div>
 
           {/* Video Player Display */}
-          <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+          <div
+            ref={playerContainerRef}
+            className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+          >
             <iframe
               key={`tv-${id}-${tvSeasonNum}-${currentEpisodeNum}-${streamServer}-${reloadKey}`}
               src={
@@ -256,8 +286,10 @@ export default function WatchSeries() {
               }
               className="w-full h-full border-0"
               allowFullScreen
+              webkitallowfullscreen="true"
+              mozallowfullscreen="true"
               referrerPolicy="no-referrer"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allow="accelerometer; autoplay *; clipboard-write *; encrypted-media *; gyroscope; picture-in-picture *; fullscreen *"
               title={`${series.title} Season ${tvSeasonNum} Episode ${currentEpisodeNum}`}
             />
           </div>
@@ -299,6 +331,14 @@ export default function WatchSeries() {
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reload</span>
               </button>
+              <button
+                onClick={toggleFullscreen}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-xs text-[#94A3B8] hover:text-white transition-all cursor-pointer"
+                title="Toggle Fullscreen"
+              >
+                {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
+                <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
+              </button>
             </div>
           </div>
 
@@ -307,13 +347,11 @@ export default function WatchSeries() {
             <span>Streaming TV Series (Season {tvSeasonNum}, Ep {currentEpisodeNum}). Switch servers if needed.</span>
             <div className="flex items-center gap-3">
               <a
-                href={
-                  streamServer === 'server3'
-                    ? `https://vidsrc.mov/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                    : streamServer === 'server2'
-                    ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                    : `https://vidsrc.sh/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                }
+                href={(TV_EMBED_SERVERS.find((s) => s.id === streamServer) || TV_EMBED_SERVERS[0]).url(
+                  id,
+                  tvSeasonNum,
+                  currentEpisodeNum
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all text-[11px] font-medium border border-white/10"

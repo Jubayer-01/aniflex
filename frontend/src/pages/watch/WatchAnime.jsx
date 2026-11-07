@@ -7,7 +7,7 @@ import { saveWatchProgress, getLastWatchedEpisode } from '../../services/watchHi
 import {
   ThumbsUp, ThumbsDown, Bookmark, Check, Share2, ArrowLeft,
   Star, Play, ChevronLeft, ChevronRight, RotateCcw,
-  SkipBack, SkipForward
+  SkipBack, SkipForward, Maximize, Minimize
 } from 'lucide-react';
 
 export default function WatchAnime() {
@@ -32,6 +32,33 @@ export default function WatchAnime() {
   const [likes, setLikes] = useState(6640);
   const [dislikes, setDislikes] = useState(127);
   const [userReaction, setUserReaction] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const playerContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!playerContainerRef.current) return;
+    if (!document.fullscreenElement) {
+      if (playerContainerRef.current.requestFullscreen) {
+        playerContainerRef.current.requestFullscreen().catch(() => {});
+      } else if (playerContainerRef.current.webkitRequestFullscreen) {
+        playerContainerRef.current.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  };
 
   const CHUNK_SIZE = 25;
 
@@ -292,7 +319,10 @@ export default function WatchAnime() {
           </div>
 
           {/* Video Player Display */}
-          <div className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+          <div
+            ref={playerContainerRef}
+            className="relative w-full aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+          >
             <iframe
               key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}-${reloadKey}`}
               src={
@@ -304,8 +334,10 @@ export default function WatchAnime() {
               }
               className="w-full h-full border-0"
               allowFullScreen
+              webkitallowfullscreen="true"
+              mozallowfullscreen="true"
               referrerPolicy="origin"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allow="accelerometer; autoplay *; clipboard-write *; encrypted-media *; gyroscope; picture-in-picture *; fullscreen *"
               title={`${animeTitle} Episode ${currentEpData.number}`}
             />
           </div>
@@ -346,6 +378,14 @@ export default function WatchAnime() {
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reload Player</span>
+              </button>
+              <button
+                onClick={toggleFullscreen}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-xs text-[#94A3B8] hover:text-white transition-all cursor-pointer"
+                title="Toggle Fullscreen"
+              >
+                {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
+                <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
               </button>
             </div>
           </div>
