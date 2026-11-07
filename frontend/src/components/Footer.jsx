@@ -20,12 +20,17 @@ export default function Footer() {
             <p className="text-xs text-[#94A3B8]">Universal Movies, Series & Anime.</p>
           </div>
 
-          {/* Links */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#94A3B8]">
-            <Link to="/about" className="hover:text-white transition-colors">About</Link>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link to="/help" className="hover:text-white transition-colors">Help</Link>
+          {/* Links & Creator */}
+          <div className="flex flex-col items-center justify-center gap-2.5">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#94A3B8]">
+              <Link to="/about" className="hover:text-white transition-colors">About</Link>
+              <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+              <Link to="/help" className="hover:text-white transition-colors">Help</Link>
+            </div>
+            <p className="text-xs text-[#94A3B8] font-medium tracking-wider">
+              Created By <span className="text-white font-semibold">Jubayer Ahmed</span>
+            </p>
           </div>
 
           {/* Social Icons matching the mockup */}
