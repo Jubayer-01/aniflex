@@ -606,7 +606,7 @@ export default function Watch() {
                     : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  Server 1 (Direct Stream)
+                  {mediaType === 'anime' ? 'Server 1 (Direct Stream)' : 'Server 1 (vidsrc.sh)'}
                 </button>
                 <button
                   onClick={() => setStreamServer('server2')}
@@ -615,7 +615,7 @@ export default function Watch() {
                     : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  Server 2 (HD Node)
+                  {mediaType === 'anime' ? 'Server 2 (HD Node)' : 'Server 2 (vidsrc.to)'}
                 </button>
                 <button
                   onClick={() => setStreamServer('server3')}
@@ -624,7 +624,7 @@ export default function Watch() {
                     : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  Server 3 (Backup Node)
+                  {mediaType === 'anime' ? 'Server 3 (Backup Node)' : 'Server 3 (vidsrc.mov)'}
                 </button>
               </div>
 
@@ -669,10 +669,10 @@ export default function Watch() {
                 key={`movie-${id}-${streamServer}-${reloadKey}`}
                 src={
                   streamServer === 'server3'
-                    ? `https://vidsrc.pm/embed/movie/${id}`
+                    ? `https://vidsrc.mov/embed/movie/${id}`
                     : streamServer === 'server2'
-                    ? `https://vidsrc.to/embed/movie/${id}`
-                    : `https://vidsrc.me/embed/movie?tmdb=${id}`
+                      ? `https://vidsrc.to/embed/movie/${id}`
+                      : `https://vidsrc.sh/embed/movie/${id}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
@@ -687,10 +687,10 @@ export default function Watch() {
                 key={`tv-${id}-${tvSeasonNum}-${currentEpisodeNum}-${streamServer}-${reloadKey}`}
                 src={
                   streamServer === 'server3'
-                    ? `https://vidsrc.pm/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                    ? `https://vidsrc.mov/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
                     : streamServer === 'server2'
-                    ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                    : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${tvSeasonNum}&episode=${currentEpisodeNum}`
+                      ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                      : `https://vidsrc.sh/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
@@ -705,10 +705,10 @@ export default function Watch() {
                 key={`anime-${id}-${currentEpData.number}-${streamServer}-${activeServer}-${reloadKey}`}
                 src={
                   streamServer === 'server3'
-                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&accent=E2E8F0&captions=en`
+                    ? `https://vidsrc.pm/embed/anime/${id || 101922}/${currentEpData.number}`
                     : streamServer === 'server2'
-                    ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=1&accent=E2E8F0`
-                    : `https://vidsrc.pm/embed/anime/${id || 101922}/${currentEpData.number}`
+                      ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=1&accent=E2E8F0`
+                      : `https://vidsrc.sh/embed/anime/${id || 101922}/${currentEpData.number}`
                 }
                 className="w-full h-full border-0"
                 allowFullScreen
@@ -767,19 +767,27 @@ export default function Watch() {
               {mediaType === 'movie'
                 ? 'Streaming in 4K/1080p. Switch between Server 1 and Server 2 if any node buffers.'
                 : mediaType === 'tv'
-                ? `Streaming TV Series (Season ${tvSeasonNum}, Ep ${currentEpisodeNum}). Switch servers if needed.`
-                : 'Video not loading? Toggle between Server 1 and Server 2, or switch Audio (Sub/Dub).'}
+                  ? `Streaming TV Series (Season ${tvSeasonNum}, Ep ${currentEpisodeNum}). Switch servers if needed.`
+                  : 'Video not loading? Toggle between Server 1 and Server 2, or switch Audio (Sub/Dub).'}
             </span>
             <div className="flex items-center gap-3">
               <a
                 href={
                   mediaType === 'movie'
-                    ? `https://vidlink.pro/movie/${id}`
+                    ? streamServer === 'server3'
+                      ? `https://vidsrc.mov/embed/movie/${id}`
+                      : streamServer === 'server2'
+                        ? `https://vidsrc.to/embed/movie/${id}`
+                        : `https://vidsrc.sh/embed/movie/${id}`
                     : mediaType === 'tv'
-                    ? `https://vidlink.pro/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                    : streamServer === 'server1'
-                    ? `https://vidsrc.pm/embed/anime/${id || 101922}/${currentEpData.number}`
-                    : `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0`
+                      ? streamServer === 'server3'
+                        ? `https://vidsrc.mov/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                        : streamServer === 'server2'
+                          ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                          : `https://vidsrc.sh/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                      : streamServer === 'server2'
+                        ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0`
+                        : `https://vidsrc.sh/embed/anime/${id || 101922}/${currentEpData.number}`
                 }
                 target="_blank"
                 rel="noreferrer"
@@ -834,11 +842,10 @@ export default function Watch() {
                   </button>
                   <button
                     onClick={() => setIsSaved(!isSaved)}
-                    className={`p-2.5 rounded-xl border transition-all text-xs flex items-center gap-1.5 cursor-pointer ${
-                      isSaved
+                    className={`p-2.5 rounded-xl border transition-all text-xs flex items-center gap-1.5 cursor-pointer ${isSaved
                         ? 'bg-white text-black border-white'
                         : 'bg-[#16181F] border-white/10 text-gray-300 hover:text-white hover:border-white/20'
-                    }`}
+                      }`}
                     title="Add to Watchlist"
                   >
                     {isSaved ? <Check className="w-4 h-4 stroke-[3]" /> : <Bookmark className="w-4 h-4" />}
@@ -1089,11 +1096,10 @@ export default function Watch() {
                               setCurrentEpisodeNum(1);
                               setIsSeasonDropdownOpen(false);
                             }}
-                            className={`w-full text-left px-4 py-2.5 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
-                              tvSeasonNum === season.season_number
+                            className={`w-full text-left px-4 py-2.5 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${tvSeasonNum === season.season_number
                                 ? 'bg-emerald-600/20 text-emerald-400 font-bold'
                                 : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             <span>{season.name || `Season ${season.season_number}`}</span>
                             <span className="text-[10px] text-[#94A3B8]">
@@ -1130,11 +1136,10 @@ export default function Watch() {
                           setCurrentEpisodeNum(ep.episode_number);
                           window.scrollTo({ top: 100, behavior: 'smooth' });
                         }}
-                        className={`group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
-                          isPlaying
+                        className={`group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 sm:p-4 rounded-2xl border transition-all cursor-pointer ${isPlaying
                             ? 'bg-[#16181F] border-emerald-500/50 ring-1 ring-emerald-500/30 shadow-xl'
                             : 'bg-[#0F1115]/70 hover:bg-[#16181F] border-white/5 hover:border-white/15'
-                        }`}
+                          }`}
                       >
                         {/* 16:9 Thumbnail with Play Overlay */}
                         <div className="relative w-full sm:w-44 aspect-video rounded-xl overflow-hidden bg-black/60 flex-none border border-white/10">
@@ -1145,9 +1150,8 @@ export default function Watch() {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                           <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                            <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                              isPlaying ? 'bg-emerald-500 text-black scale-105' : 'bg-white/80 group-hover:bg-white text-black group-hover:scale-110'
-                            }`}>
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${isPlaying ? 'bg-emerald-500 text-black scale-105' : 'bg-white/80 group-hover:bg-white text-black group-hover:scale-110'
+                              }`}>
                               <Play className="w-4 h-4 fill-black translate-x-0.5" />
                             </div>
                           </div>
@@ -1159,9 +1163,8 @@ export default function Watch() {
                         {/* Episode Info */}
                         <div className="flex-1 min-w-0 space-y-1">
                           <div className="flex items-center gap-2">
-                            <h4 className={`text-sm sm:text-base font-bold line-clamp-1 transition-colors ${
-                              isPlaying ? 'text-emerald-400' : 'text-white group-hover:text-emerald-300'
-                            }`}>
+                            <h4 className={`text-sm sm:text-base font-bold line-clamp-1 transition-colors ${isPlaying ? 'text-emerald-400' : 'text-white group-hover:text-emerald-300'
+                              }`}>
                               {ep.episode_number}. {ep.name || `Episode ${ep.episode_number}`}
                             </h4>
                             {isPlaying && (
@@ -1237,11 +1240,10 @@ export default function Watch() {
                       <button
                         key={chunk.label}
                         onClick={() => setSelectedChunkIdx(idx)}
-                        className={`flex-none px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                          selectedChunkIdx === idx
+                        className={`flex-none px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${selectedChunkIdx === idx
                             ? 'bg-[#E2E8F0] text-black border-[#E2E8F0] shadow-sm'
                             : 'bg-[#16181F] border-white/10 text-[#94A3B8] hover:text-white hover:border-white/20'
-                        }`}
+                          }`}
                       >
                         {chunk.label}
                       </button>
@@ -1267,11 +1269,10 @@ export default function Watch() {
                     <div
                       key={ep.number}
                       onClick={() => handleSelectEpisode(ep.number)}
-                      className={`group relative rounded-2xl overflow-hidden bg-[#16181F] border transition-all duration-300 cursor-pointer hover:-translate-y-1 shadow-lg ${
-                        isPlaying
+                      className={`group relative rounded-2xl overflow-hidden bg-[#16181F] border transition-all duration-300 cursor-pointer hover:-translate-y-1 shadow-lg ${isPlaying
                           ? 'border-[#E2E8F0] ring-1 ring-white/40 shadow-xl'
                           : 'border-white/10 hover:border-white/30'
-                      }`}
+                        }`}
                     >
                       <div className="relative aspect-video w-full overflow-hidden bg-black/50">
                         <img
@@ -1283,11 +1284,10 @@ export default function Watch() {
                         <div className="absolute inset-0 bg-gradient-to-t from-[#16181F] via-transparent to-transparent opacity-80" />
 
                         <div
-                          className={`absolute inset-0 flex items-center justify-center transition-opacity ${
-                            isPlaying
+                          className={`absolute inset-0 flex items-center justify-center transition-opacity ${isPlaying
                               ? 'opacity-100 bg-white/10'
                               : 'opacity-0 group-hover:opacity-100 bg-black/40'
-                          }`}
+                            }`}
                         >
                           <div className="w-11 h-11 rounded-full bg-white text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
                             <Play className="w-5 h-5 fill-black text-black translate-x-0.5" />
@@ -1306,9 +1306,8 @@ export default function Watch() {
                       <div className="p-3.5 space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <h4
-                            className={`text-sm font-bold leading-snug line-clamp-1 transition-colors ${
-                              isPlaying ? 'text-[#E2E8F0]' : 'text-white group-hover:text-gray-200'
-                            }`}
+                            className={`text-sm font-bold leading-snug line-clamp-1 transition-colors ${isPlaying ? 'text-[#E2E8F0]' : 'text-white group-hover:text-gray-200'
+                              }`}
                           >
                             {ep.title}
                           </h4>
