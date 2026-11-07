@@ -13,7 +13,7 @@ import {
 const TV_EMBED_SERVERS = [
   { id: 'multiembed', name: 'Server 1: MultiEmbed (Eng/Hindi)', url: (id, s, e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` },
   { id: 'vidlink', name: 'Server 2: VidLink (Fast)', url: (id, s, e) => `https://vidlink.pro/tv/${id}/${s}/${e}` },
-  { id: 'vidsrc_sh', name: 'Server 3: VidSrc SH', url: (id, s, e) => `https://vidsrc.sh/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
+  { id: 'vidsrc_sh', name: 'Server 3: VidSrc SH', url: (id, s, e) => `https://vidsrc.sh/embed/tv?tmdb=${id}&season=${s}&episode=${e}&api_key=ocla4LUHNQ3ZDWxlbkGLOIbNfU5dirz4KvfniTcX` },
 ];
 
 export default function WatchSeries() {

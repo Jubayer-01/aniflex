@@ -12,7 +12,7 @@ import {
 const EMBED_SERVERS = [
   { id: 'multiembed', name: 'Server 1: MultiEmbed (Eng/Hindi)', url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1` },
   { id: 'vidlink', name: 'Server 2: VidLink (Fast)', url: (id) => `https://vidlink.pro/movie/${id}` },
-  { id: 'vidsrc_sh', name: 'Server 3: VidSrc SH', url: (id) => `https://vidsrc.sh/embed/movie?tmdb=${id}` },
+  { id: 'vidsrc_sh', name: 'Server 3: VidSrc SH', url: (id) => `https://vidsrc.sh/embed/movie?tmdb=${id}&api_key=ocla4LUHNQ3ZDWxlbkGLOIbNfU5dirz4KvfniTcX` },
 ];
 
 export default function WatchMovie() {
