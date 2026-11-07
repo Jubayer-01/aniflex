@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
 import Hero from '../components/Hero';
-import ContinueWatchingRow from '../components/ContinueWatchingRow';
 import AnimeRow from '../components/AnimeRow';
 import {
   getHomePageCatalog
 } from '../services/anilistService';
-import { getWatchHistory } from '../services/watchHistoryService';
 import { useNavigate } from 'react-router-dom';
 
 // Lightweight GPU-accelerated scroll fade-in wrapper
@@ -50,7 +48,6 @@ function FadeInRow({ children, className = '' }) {
 export default function Anime() {
   const navigate = useNavigate();
   const [heroAnime, setHeroAnime] = useState(null);
-  const [continueWatching, setContinueWatching] = useState(() => getWatchHistory());
   const [catalog, setCatalog] = useState({
     trending: [],
     popular: [],
@@ -104,24 +101,10 @@ export default function Anime() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // 3. Reactively update Continue Watching when any episode is watched
-    const handleHistoryUpdate = (e) => {
-      if (e.detail) {
-        setContinueWatching(e.detail);
-      } else {
-        setContinueWatching(getWatchHistory());
-      }
-    };
-
-    window.addEventListener('aniflex:watchHistoryUpdate', handleHistoryUpdate);
-    window.addEventListener('storage', handleHistoryUpdate);
-
     return () => {
       isMounted = false;
       clearInterval(refreshTimer);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('aniflex:watchHistoryUpdate', handleHistoryUpdate);
-      window.removeEventListener('storage', handleHistoryUpdate);
     };
   }, []);
 
@@ -142,9 +125,6 @@ export default function Anime() {
 
       {/* Main Content Shelves */}
       <div className="relative z-20 -mt-16 space-y-3 pb-12">
-        {/* Continue Watching Shelf */}
-        <ContinueWatchingRow items={continueWatching} />
-
         {/* Trending Now */}
         <FadeInRow>
           <AnimeRow

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, Film, Tv, Play, Sparkles, Clapperboard, Star } from 'lucide-react';
 import Hero from '../components/Hero';
-import ContinueWatchingRow from '../components/ContinueWatchingRow';
 import AnimeRow from '../components/AnimeRow';
 import { getHomePageCatalog } from '../services/anilistService';
 import {
@@ -12,7 +11,6 @@ import {
   getPopularSeries,
   getTMDBImageUrl,
 } from '../services/tmdbService';
-import { getWatchHistory } from '../services/watchHistoryService';
 
 // Lightweight GPU-accelerated scroll fade-in wrapper
 function FadeInRow({ children, className = '' }) {
@@ -54,7 +52,6 @@ function FadeInRow({ children, className = '' }) {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [continueWatching, setContinueWatching] = useState(() => getWatchHistory());
   const [heroItems, setHeroItems] = useState([]);
   const [trendingAll, setTrendingAll] = useState([]);
   const [hollywoodMovies, setHollywoodMovies] = useState([]);
@@ -116,19 +113,8 @@ export default function Home() {
 
     loadOmniData();
 
-    // Watch history listener
-    const handleHistoryUpdate = (e) => {
-      if (e.detail) setContinueWatching(e.detail);
-      else setContinueWatching(getWatchHistory());
-    };
-
-    window.addEventListener('aniflex:watchHistoryUpdate', handleHistoryUpdate);
-    window.addEventListener('storage', handleHistoryUpdate);
-
     return () => {
       isMounted = false;
-      window.removeEventListener('aniflex:watchHistoryUpdate', handleHistoryUpdate);
-      window.removeEventListener('storage', handleHistoryUpdate);
     };
   }, []);
 
@@ -168,9 +154,6 @@ export default function Home() {
 
       {/* 2. Main Entertainment Shelves */}
       <div className="relative z-20 pt-6 space-y-3 pb-16">
-        {/* Continue Watching Shelf */}
-        <ContinueWatchingRow items={continueWatching} />
-
         {/* Global Trending Now */}
         <FadeInRow>
           <AnimeRow
