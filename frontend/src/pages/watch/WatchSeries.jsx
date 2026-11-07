@@ -10,6 +10,12 @@ import {
   SkipBack, SkipForward
 } from 'lucide-react';
 
+const TV_EMBED_SERVERS = [
+  { id: 'multiembed', name: 'Server 1: MultiEmbed (Eng/Hindi)', url: (id, s, e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` },
+  { id: 'vidlink', name: 'Server 2: VidLink (Fast)', url: (id, s, e) => `https://vidlink.pro/tv/${id}/${s}/${e}` },
+  { id: 'vidsrc_sh', name: 'Server 3: VidSrc SH', url: (id, s, e) => `https://vidsrc.sh/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
+];
+
 export default function WatchSeries() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,7 +26,7 @@ export default function WatchSeries() {
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [streamServer, setStreamServer] = useState('server1'); // 'server1' (vidsrc.sh) | 'server2' (vidsrc.to) | 'server3' (vidsrc.mov)
+  const [streamServer, setStreamServer] = useState('multiembed');
   const [reloadKey, setReloadKey] = useState(0);
 
   // TV Seasons & Episodes State
@@ -208,7 +214,7 @@ export default function WatchSeries() {
       {/* 1. CINEMA VIDEO PLAYER STAGE */}
       <section className="relative w-full bg-black border-b border-white/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
-          {/* Top Bar: Back button, Server Switcher */}
+          {/* Top Bar: Back button & Server Switcher */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3 px-2">
             <button
               onClick={() => navigate(-1)}
@@ -219,38 +225,21 @@ export default function WatchSeries() {
             </button>
 
             {/* Server Switcher */}
-            <div className="flex items-center gap-1 bg-[#0F1115] border border-white/10 rounded-full px-2 py-1 text-xs">
-              <span className="text-[#94A3B8] text-[11px] px-2 font-medium">Server:</span>
-              <button
-                onClick={() => setStreamServer('server1')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  streamServer === 'server1'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Server 1 (vidsrc.sh)
-              </button>
-              <button
-                onClick={() => setStreamServer('server2')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  streamServer === 'server2'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Server 2 (vidsrc.to)
-              </button>
-              <button
-                onClick={() => setStreamServer('server3')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  streamServer === 'server3'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Server 3 (vidsrc.mov)
-              </button>
+            <div className="flex items-center gap-1 bg-[#0F1115] border border-white/10 rounded-full px-2 py-1 text-xs overflow-x-auto max-w-full">
+              <span className="text-[#94A3B8] text-[11px] px-1 font-medium shrink-0">Server:</span>
+              {TV_EMBED_SERVERS.map((srv) => (
+                <button
+                  key={srv.id}
+                  onClick={() => setStreamServer(srv.id)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    streamServer === srv.id
+                      ? 'bg-[#E2E8F0] text-black shadow-sm'
+                      : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {srv.name}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -259,15 +248,15 @@ export default function WatchSeries() {
             <iframe
               key={`tv-${id}-${tvSeasonNum}-${currentEpisodeNum}-${streamServer}-${reloadKey}`}
               src={
-                streamServer === 'server3'
-                  ? `https://vidsrc.mov/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                  : streamServer === 'server2'
-                  ? `https://vidsrc.to/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
-                  : `https://vidsrc.sh/embed/tv/${id}/${tvSeasonNum}/${currentEpisodeNum}`
+                (TV_EMBED_SERVERS.find((s) => s.id === streamServer) || TV_EMBED_SERVERS[0]).url(
+                  id,
+                  tvSeasonNum,
+                  currentEpisodeNum
+                )
               }
               className="w-full h-full border-0"
               allowFullScreen
-              referrerPolicy="origin"
+              referrerPolicy="no-referrer"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               title={`${series.title} Season ${tvSeasonNum} Episode ${currentEpisodeNum}`}
             />
@@ -572,3 +561,4 @@ export default function WatchSeries() {
     </div>
   );
 }
+

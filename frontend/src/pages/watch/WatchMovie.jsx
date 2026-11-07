@@ -9,6 +9,12 @@ import {
   Star, Play, RotateCcw
 } from 'lucide-react';
 
+const EMBED_SERVERS = [
+  { id: 'multiembed', name: 'Server 1: MultiEmbed (Eng/Hindi)', url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1` },
+  { id: 'vidlink', name: 'Server 2: VidLink (Fast)', url: (id) => `https://vidlink.pro/movie/${id}` },
+  { id: 'vidsrc_sh', name: 'Server 3: VidSrc SH', url: (id) => `https://vidsrc.sh/embed/movie?tmdb=${id}` },
+];
+
 export default function WatchMovie() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -18,7 +24,7 @@ export default function WatchMovie() {
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [streamServer, setStreamServer] = useState('server1'); // 'server1' (vidsrc.sh) | 'server2' (vidsrc.to) | 'server3' (vidsrc.mov)
+  const [streamServer, setStreamServer] = useState('multiembed');
   const [reloadKey, setReloadKey] = useState(0);
   const [likes, setLikes] = useState(5420);
   const [dislikes, setDislikes] = useState(84);
@@ -144,7 +150,7 @@ export default function WatchMovie() {
       {/* 1. CINEMA VIDEO PLAYER STAGE */}
       <section className="relative w-full bg-black border-b border-white/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
-          {/* Top Bar: Back button, Server Switcher */}
+          {/* Top Bar: Back button & Server Switcher */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3 px-2">
             <button
               onClick={() => navigate(-1)}
@@ -155,38 +161,21 @@ export default function WatchMovie() {
             </button>
 
             {/* Server Switcher */}
-            <div className="flex items-center gap-1 bg-[#0F1115] border border-white/10 rounded-full px-2 py-1 text-xs">
-              <span className="text-[#94A3B8] text-[11px] px-2 font-medium">Server:</span>
-              <button
-                onClick={() => setStreamServer('server1')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  streamServer === 'server1'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Server 1 (vidsrc.sh)
-              </button>
-              <button
-                onClick={() => setStreamServer('server2')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  streamServer === 'server2'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Server 2 (vidsrc.to)
-              </button>
-              <button
-                onClick={() => setStreamServer('server3')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  streamServer === 'server3'
-                    ? 'bg-[#E2E8F0] text-black shadow-sm'
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Server 3 (vidsrc.mov)
-              </button>
+            <div className="flex items-center gap-1 bg-[#0F1115] border border-white/10 rounded-full px-2 py-1 text-xs overflow-x-auto max-w-full">
+              <span className="text-[#94A3B8] text-[11px] px-1 font-medium shrink-0">Server:</span>
+              {EMBED_SERVERS.map((srv) => (
+                <button
+                  key={srv.id}
+                  onClick={() => setStreamServer(srv.id)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    streamServer === srv.id
+                      ? 'bg-[#E2E8F0] text-black shadow-sm'
+                      : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {srv.name}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -208,15 +197,11 @@ export default function WatchMovie() {
             <iframe
               key={`movie-${id}-${streamServer}-${reloadKey}`}
               src={
-                streamServer === 'server3'
-                  ? `https://vidsrc.mov/embed/movie/${id}`
-                  : streamServer === 'server2'
-                  ? `https://vidsrc.to/embed/movie/${id}`
-                  : `https://vidsrc.sh/embed/movie/${id}`
+                (EMBED_SERVERS.find((s) => s.id === streamServer) || EMBED_SERVERS[0]).url(id)
               }
               className="w-full h-full border-0"
               allowFullScreen
-              referrerPolicy="origin"
+              referrerPolicy="no-referrer"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               title={`${movie.title} - Full Movie`}
             />
@@ -225,7 +210,7 @@ export default function WatchMovie() {
           {/* Quick Reload and Direct Link Bar */}
           <div className="flex items-center justify-between text-xs text-[#94A3B8]/70 mt-3 px-2 flex-wrap gap-2">
             <div className="flex items-center gap-3">
-              <span>Streaming in 4K/1080p. Switch between Server 1, 2, or 3 if any node buffers.</span>
+              <span>Streaming in 4K/1080p. Switch between servers if any node buffers.</span>
               <button
                 onClick={() => setReloadKey((prev) => prev + 1)}
                 className="inline-flex items-center gap-1 text-[#94A3B8] hover:text-white transition-colors cursor-pointer"
@@ -238,13 +223,7 @@ export default function WatchMovie() {
 
             <div className="flex items-center gap-3">
               <a
-                href={
-                  streamServer === 'server3'
-                    ? `https://vidsrc.mov/embed/movie/${id}`
-                    : streamServer === 'server2'
-                    ? `https://vidsrc.to/embed/movie/${id}`
-                    : `https://vidsrc.sh/embed/movie/${id}`
-                }
+                href={(EMBED_SERVERS.find((s) => s.id === streamServer) || EMBED_SERVERS[0]).url(id)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all text-[11px] font-medium border border-white/10"
@@ -407,3 +386,4 @@ export default function WatchMovie() {
     </div>
   );
 }
+
