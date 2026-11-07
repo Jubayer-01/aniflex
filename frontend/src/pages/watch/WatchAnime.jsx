@@ -274,7 +274,7 @@ export default function WatchAnime() {
                       : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  Server 1 (Direct Stream)
+                  Server 1 (VidPlus)
                 </button>
                 <button
                   onClick={() => setStreamServer('server2')}
@@ -330,13 +330,13 @@ export default function WatchAnime() {
                   ? `https://vidsrc.pm/embed/anime/${id || 101922}/${currentEpData.number}`
                   : streamServer === 'server2'
                   ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0&autoSkip=1&accent=E2E8F0`
-                  : `https://vidsrc.sh/embed/anime/${id || 101922}/${currentEpData.number}`
+                  : `https://player.vidplus.to/embed/anime/${id || 101922}/${currentEpData.number}?dub=${activeServer.startsWith('Dub') ? 'true' : 'false'}&autoplay=false`
               }
               className="w-full h-full border-0"
               allowFullScreen
               webkitallowfullscreen="true"
               mozallowfullscreen="true"
-              referrerPolicy="origin"
+              referrerPolicy="no-referrer"
               allow="accelerometer; autoplay *; clipboard-write *; encrypted-media *; gyroscope; picture-in-picture *; fullscreen *"
               title={`${animeTitle} Episode ${currentEpData.number}`}
             />
@@ -396,9 +396,11 @@ export default function WatchAnime() {
             <div className="flex items-center gap-3">
               <a
                 href={
-                  streamServer === 'server2'
+                  streamServer === 'server1'
+                    ? `https://player.vidplus.to/embed/anime/${id || 101922}/${currentEpData.number}?dub=${activeServer.startsWith('Dub') ? 'true' : 'false'}&autoplay=false`
+                    : streamServer === 'server2'
                     ? `https://animeembed.com/embed/ani/${id || 101922}/${currentEpData.number}?track=${activeServer.startsWith('Dub') ? 'dub' : 'sub'}&server=1&autoPlay=0`
-                    : `https://vidsrc.sh/embed/anime/${id || 101922}/${currentEpData.number}`
+                    : `https://vidsrc.pm/embed/anime/${id || 101922}/${currentEpData.number}`
                 }
                 target="_blank"
                 rel="noreferrer"
