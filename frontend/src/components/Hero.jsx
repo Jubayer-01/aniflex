@@ -138,7 +138,7 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
               {title}
             </h1>
             {subtitle && (
-              <p className="text-xs sm:text-sm font-semibold text-[#94A3B8] tracking-wider uppercase drop-shadow-md">
+              <p className="text-xs sm:text-sm font-semibold text-[#CBD5E1] tracking-wider uppercase drop-shadow-md">
                 {subtitle}
               </p>
             )}
@@ -172,7 +172,7 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="text-xs sm:text-sm text-gray-300/90 line-clamp-3 leading-relaxed max-w-lg drop-shadow-md"
+            className="text-xs sm:text-sm text-gray-200 line-clamp-3 leading-relaxed max-w-lg drop-shadow-md"
           >
             {description}
           </motion.p>

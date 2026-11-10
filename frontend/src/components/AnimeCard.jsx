@@ -106,9 +106,9 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
 
       {/* Bottom Title & Details */}
       <div className="absolute bottom-0 left-0 right-0 p-3 space-y-1">
-        <h4 className="text-white font-bold text-sm sm:text-base leading-snug line-clamp-2 drop-shadow-md group-hover:text-[#E2E8F0] transition-colors">
+        <h3 className="text-white font-bold text-sm sm:text-base leading-snug line-clamp-2 drop-shadow-md group-hover:text-[#E2E8F0] transition-colors">
           {title}
-        </h4>
+        </h3>
         <div className="flex items-center gap-2 text-[11px] text-[#94A3B8] font-medium">
           {year && <span>{year}</span>}
           {anime.episodes && (
