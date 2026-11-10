@@ -31,7 +31,8 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
   if (!currentAnime) return null;
 
   const title = currentAnime.title?.english || currentAnime.title?.romaji || currentAnime.title || currentAnime.name || '';
-  const subtitle = currentAnime.title?.romaji && currentAnime.title?.english ? currentAnime.title.romaji : null;
+  const rawSubtitle = currentAnime.title?.romaji && currentAnime.title?.english ? currentAnime.title.romaji : null;
+  const subtitle = rawSubtitle && rawSubtitle.toLowerCase().trim() !== title.toLowerCase().trim() ? rawSubtitle : null;
   const banner = currentAnime.bannerImage || currentAnime.coverImage?.extraLarge || '';
   const score = currentAnime.score || (currentAnime.averageScore ? (currentAnime.averageScore / 10).toFixed(1) : '');
   const year = currentAnime.year || currentAnime.seasonYear || '';
@@ -69,7 +70,7 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full h-[75vh] min-h-[580px] max-h-[820px] flex items-end justify-start overflow-hidden pb-12 sm:pb-16 lg:pb-20 pt-16 bg-[#060709]"
+      className="relative w-full h-[78vh] sm:h-[75vh] min-h-[540px] sm:min-h-[580px] max-h-[820px] flex items-end justify-start overflow-hidden pb-10 sm:pb-16 lg:pb-20 pt-16 bg-[#060709]"
     >
       {/* 1. CINEMA WIDESCREEN BACKDROP */}
       <AnimatePresence mode="wait" initial={false}>
@@ -88,26 +89,26 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
             loading="eager"
             fetchpriority="high"
             decoding="async"
-            className="w-full h-full object-cover object-[center_20%] lg:object-[center_15%] filter brightness-[0.85] transition-all duration-700"
+            className="w-full h-full object-cover object-[center_20%] lg:object-[center_15%] filter brightness-[0.80] sm:brightness-[0.85] transition-all duration-700"
           />
 
           {/* Cinematic Gradient Masks */}
           {/* Left Edge Shadow for Text Legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#060709] via-[#060709]/60 to-transparent w-full md:w-3/5 lg:w-1/2 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#060709]/95 via-[#060709]/75 sm:via-[#060709]/60 to-transparent w-full md:w-3/5 lg:w-1/2 z-10" />
           {/* Bottom Blend to dark page */}
-          <div className="absolute inset-x-0 bottom-0 h-48 lg:h-64 bg-gradient-to-t from-[#060709] via-[#060709]/70 to-transparent z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-64 sm:h-56 lg:h-64 bg-gradient-to-t from-[#060709] via-[#060709]/90 sm:via-[#060709]/70 to-transparent z-10" />
           {/* Top Subtle Vignette */}
-          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#060709]/70 via-transparent to-transparent z-10" />
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#060709]/80 via-transparent to-transparent z-10" />
         </motion.div>
       </AnimatePresence>
 
-      {/* 2. FLOATING EDGE NAVIGATION ARROWS (Left & Right) */}
+      {/* 2. FLOATING EDGE NAVIGATION ARROWS (Hidden on mobile to avoid covering faces/content) */}
       {trendingList.length > 1 && (
         <>
           <button
             onClick={handlePrev}
             aria-label="Previous Slide"
-            className="absolute left-3 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 w-10 sm:w-11 h-10 sm:h-11 rounded-full bg-black/40 hover:bg-black/75 border border-white/15 text-white/80 hover:text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xl"
+            className="hidden sm:flex absolute left-3 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 w-10 sm:w-11 h-10 sm:h-11 rounded-full bg-black/40 hover:bg-black/75 border border-white/15 text-white/80 hover:text-white items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xl"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -115,7 +116,7 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
           <button
             onClick={handleNext}
             aria-label="Next Slide"
-            className="absolute right-3 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 w-10 sm:w-11 h-10 sm:h-11 rounded-full bg-black/40 hover:bg-black/75 border border-white/15 text-white/80 hover:text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xl"
+            className="hidden sm:flex absolute right-3 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 w-10 sm:w-11 h-10 sm:h-11 rounded-full bg-black/40 hover:bg-black/75 border border-white/15 text-white/80 hover:text-white items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xl"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -177,55 +178,45 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
           </motion.p>
 
           {/* Action Buttons Matching Reference Style */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 pt-1.5 w-full">
             {/* Play Now: Solid White Pill */}
             <button
               onClick={handlePlayNow}
-              className="flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-xl cursor-pointer"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-200 px-5 sm:px-6 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-xl cursor-pointer"
             >
-              <Play className="w-4 h-4 fill-black text-black" />
+              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black text-black" />
               <span>Play Now</span>
             </button>
 
             {/* + Watchlist: Translucent Glass Pill */}
             <button
               onClick={() => setIsSaved(!isSaved)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 hover:scale-105 active:scale-95 border backdrop-blur-md cursor-pointer ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 hover:scale-105 active:scale-95 border backdrop-blur-md cursor-pointer ${
                 isSaved
                   ? 'bg-[#E2E8F0] text-black border-[#E2E8F0] shadow-md'
                   : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
               }`}
             >
-              {isSaved ? <Bookmark className="w-4 h-4 fill-black" /> : <Plus className="w-4 h-4 text-white" />}
-              <span>{isSaved ? 'In Watchlist' : 'Watchlist'}</span>
+              {isSaved ? <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black" /> : <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />}
+              <span>{isSaved ? 'In List' : 'Watchlist'}</span>
             </button>
 
             {/* Circular Info Button */}
             <button
               onClick={() => onOpenDetails && onOpenDetails(currentAnime)}
               aria-label="More Info"
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
               title="More Details"
             >
               <Info className="w-4 h-4" />
-            </button>
-
-            {/* Circular Film / Watch Button */}
-            <button
-              onClick={handlePlayNow}
-              aria-label="Stream Now"
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
-              title="Stream Now"
-            >
-              <Film className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* 4. BOTTOM-RIGHT SLEEK PAGINATION INDICATOR */}
+      {/* 4. SLEEK PAGINATION INDICATOR */}
       {trendingList.length > 1 && (
-        <div className="absolute bottom-6 sm:bottom-8 right-6 sm:right-10 lg:right-14 z-30 flex items-center gap-2">
+        <div className="absolute bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 sm:left-auto sm:right-10 lg:right-14 sm:translate-x-0 z-30 flex items-center gap-1.5 sm:gap-2">
           {trendingList.map((_, dotIdx) => {
             const isActive = activeIdx === dotIdx;
             return (
