@@ -60,7 +60,7 @@ export default function Navbar({ onOpenSearch }) {
           </span>
         </Link>
 
-        {/* Center Pill Navigation with Smooth Gliding Active Pill */}
+        {/* Center Pill Navigation with Static Instant Active Pill */}
         <nav className="hidden md:flex items-center bg-[#0F1115]/90 backdrop-blur-lg border border-white/10 rounded-full p-1.5 shadow-inner">
           {navLinks.map((link) => {
             const isActive = link.path.includes('?')
@@ -70,24 +70,13 @@ export default function Navbar({ onOpenSearch }) {
               <Link
                 key={link.name}
                 to={link.path}
-                className={`relative px-5 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 select-none ${
+                className={`px-5 py-1.5 rounded-full text-sm font-medium select-none transition-colors duration-150 ${
                   isActive
-                    ? 'text-black font-bold'
+                    ? 'bg-[#E2E8F0] text-black font-bold shadow-sm'
                     : 'text-[#94A3B8] hover:text-white'
                 }`}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="navbar-active-pill"
-                    className="absolute inset-0 bg-[#E2E8F0] rounded-full shadow-sm"
-                    transition={{
-                      type: 'spring',
-                      stiffness: 400,
-                      damping: 32,
-                    }}
-                  />
-                )}
-                <span className="relative z-10">{link.name}</span>
+                {link.name}
               </Link>
             );
           })}
