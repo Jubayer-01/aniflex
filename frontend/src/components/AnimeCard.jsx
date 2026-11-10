@@ -97,6 +97,7 @@ export default function AnimeCard({ anime, onClick, onPlay, className = '' }) {
             e.stopPropagation();
             onPlay && onPlay(anime);
           }}
+          aria-label={`Play ${title}`}
           className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-xl pointer-events-auto transform group-hover:scale-110 active:scale-95 transition-all"
         >
           <Play className="w-5 h-5 fill-black text-black translate-x-0.5" />
