@@ -80,6 +80,7 @@ export default function Home() {
           const movieTvHeroes = omniTrending.slice(0, 6).map((m) => ({
             id: m.id,
             title: { english: m.title || m.name, romaji: m.original_title || m.original_name },
+            backdrop_path: m.backdrop_path,
             bannerImage: getTMDBImageUrl(m.backdrop_path, 'w1280'),
             coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w342') },
             score: m.vote_average ? m.vote_average.toFixed(1) : '8.5',

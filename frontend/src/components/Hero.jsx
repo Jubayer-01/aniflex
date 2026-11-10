@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Play, Info, Bookmark, Star, ChevronLeft, ChevronRight, Plus, Film } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { getTMDBImageUrl } from '../services/tmdbService';
 
 const SLIDE_DURATION_MS = 7000; // 7-second auto loop
 
@@ -34,6 +35,9 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
   const rawSubtitle = currentAnime.title?.romaji && currentAnime.title?.english ? currentAnime.title.romaji : null;
   const subtitle = rawSubtitle && rawSubtitle.toLowerCase().trim() !== title.toLowerCase().trim() ? rawSubtitle : null;
   const banner = currentAnime.bannerImage || currentAnime.coverImage?.extraLarge || '';
+  const mobileBanner = currentAnime.backdrop_path ? getTMDBImageUrl(currentAnime.backdrop_path, 'w780') : banner;
+  const desktopBanner = currentAnime.backdrop_path ? getTMDBImageUrl(currentAnime.backdrop_path, 'w1280') : banner;
+  const srcSet = currentAnime.backdrop_path ? `${mobileBanner} 780w, ${desktopBanner} 1280w` : undefined;
   const score = currentAnime.score || (currentAnime.averageScore ? (currentAnime.averageScore / 10).toFixed(1) : '');
   const year = currentAnime.year || currentAnime.seasonYear || '';
   const format = currentAnime.format
@@ -84,7 +88,9 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
         >
           {/* Crisp Widescreen Foreground Banner */}
           <img
-            src={banner}
+            src={mobileBanner}
+            srcSet={srcSet}
+            sizes="(max-width: 768px) 100vw, 1280px"
             alt={title}
             loading="eager"
             fetchpriority="high"
