@@ -52,7 +52,15 @@ function FadeInRow({ children, className = '' }) {
 
 export default function Home() {
   const navigate = useNavigate();
-  const [heroItems, setHeroItems] = useState([]);
+  // Initialize with cached hero items for instant zero-delay LCP paint
+  const [heroItems, setHeroItems] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('omni_hero_cache');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [trendingAll, setTrendingAll] = useState([]);
   const [hollywoodMovies, setHollywoodMovies] = useState([]);
   const [bollywoodMovies, setBollywoodMovies] = useState([]);
@@ -66,44 +74,43 @@ export default function Home() {
     async function loadOmniData() {
       try {
         setLoading(true);
-        const [omniRes, hwRes, bwRes, tvRes, animeRes] = await Promise.allSettled([
-          getTrendingAll(),
+
+        // Fetch Hero data first so LCP element can resolve immediately
+        const heroPromise = getTrendingAll().then((omniTrending) => {
+          if (!isMounted || !omniTrending) return;
+          const movieTvHeroes = omniTrending.slice(0, 6).map((m) => ({
+            id: m.id,
+            title: { english: m.title || m.name, romaji: m.original_title || m.original_name },
+            bannerImage: getTMDBImageUrl(m.backdrop_path, 'w1280'),
+            coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w342') },
+            score: m.vote_average ? m.vote_average.toFixed(1) : '8.5',
+            year: m.release_date?.slice(0, 4) || m.first_air_date?.slice(0, 4) || '2026',
+            description: m.overview,
+            genres: [m.media_type === 'tv' ? 'TV Series' : 'Blockbuster Movie'],
+            media_type: m.media_type || (m.first_air_date ? 'tv' : 'movie'),
+          }));
+          setTrendingAll(omniTrending);
+          setHeroItems(movieTvHeroes);
+          try {
+            sessionStorage.setItem('omni_hero_cache', JSON.stringify(movieTvHeroes));
+          } catch {}
+        });
+
+        // Fetch remaining shelf rows in parallel without blocking hero
+        const shelfPromises = Promise.allSettled([
           getHollywoodMovies(1),
           getBollywoodMovies(1),
           getPopularSeries(1),
           getHomePageCatalog(false),
-        ]);
+        ]).then(([hwRes, bwRes, tvRes, animeRes]) => {
+          if (!isMounted) return;
+          if (hwRes.status === 'fulfilled') setHollywoodMovies(hwRes.value || []);
+          if (bwRes.status === 'fulfilled') setBollywoodMovies(bwRes.value || []);
+          if (tvRes.status === 'fulfilled') setTvSeries(tvRes.value || []);
+          if (animeRes.status === 'fulfilled') setAnimeList(animeRes.value?.trending || []);
+        });
 
-        if (!isMounted) return;
-
-        const omniTrending = omniRes.status === 'fulfilled' ? omniRes.value : [];
-        const hw1 = hwRes.status === 'fulfilled' ? hwRes.value : [];
-        const bw1 = bwRes.status === 'fulfilled' ? bwRes.value : [];
-        const tv1 = tvRes.status === 'fulfilled' ? tvRes.value : [];
-        const animeCatalog = animeRes.status === 'fulfilled' ? animeRes.value : null;
-
-        setTrendingAll(omniTrending || []);
-        setHollywoodMovies(hw1 || []);
-        setBollywoodMovies(bw1 || []);
-        setTvSeries(tv1 || []);
-
-        const topAnime = animeCatalog?.trending || [];
-        setAnimeList(topAnime);
-
-        // Build Hero banner strictly from trending Movies & TV Series (Zero Anime)
-        const movieTvHeroes = (omniTrending || []).slice(0, 6).map((m) => ({
-          id: m.id,
-          title: { english: m.title || m.name, romaji: m.original_title || m.original_name },
-          bannerImage: getTMDBImageUrl(m.backdrop_path, 'w1280'),
-          coverImage: { extraLarge: getTMDBImageUrl(m.poster_path, 'w342') },
-          score: m.vote_average ? m.vote_average.toFixed(1) : '8.5',
-          year: m.release_date?.slice(0, 4) || m.first_air_date?.slice(0, 4) || '2026',
-          description: m.overview,
-          genres: [m.media_type === 'tv' ? 'TV Series' : 'Blockbuster Movie'],
-          media_type: m.media_type || (m.first_air_date ? 'tv' : 'movie'),
-        }));
-
-        setHeroItems(movieTvHeroes);
+        await Promise.all([heroPromise, shelfPromises]);
       } catch (err) {
         console.error('Omni home load error:', err);
       } finally {

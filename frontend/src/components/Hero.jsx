@@ -13,12 +13,14 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [hasSwapped, setHasSwapped] = useState(false);
 
   // Auto-rotation loop (every 7 seconds, pauses on mouse hover)
   useEffect(() => {
     if (trendingList.length <= 1 || isPaused) return;
 
     const timer = setInterval(() => {
+      setHasSwapped(true);
       setActiveIdx((prev) => (prev + 1) % trendingList.length);
     }, SLIDE_DURATION_MS);
 
@@ -44,10 +46,12 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
   const description = (currentAnime.description || currentAnime.overview || '').replace(/<[^>]*>?/gm, '');
 
   const handlePrev = () => {
+    setHasSwapped(true);
     setActiveIdx((prev) => (prev - 1 + trendingList.length) % trendingList.length);
   };
 
   const handleNext = () => {
+    setHasSwapped(true);
     setActiveIdx((prev) => (prev + 1) % trendingList.length);
   };
 
@@ -68,13 +72,13 @@ export default function Hero({ items = [], anime, onOpenDetails }) {
       className="relative w-full h-[75vh] min-h-[580px] max-h-[820px] flex items-end justify-start overflow-hidden pb-12 sm:pb-16 lg:pb-20 pt-16 bg-[#060709]"
     >
       {/* 1. CINEMA WIDESCREEN BACKDROP */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={currentAnime.id || activeIdx}
-          initial={{ opacity: 0 }}
+          initial={hasSwapped ? { opacity: 0 } : false}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
           className="absolute inset-0 z-0 bg-[#060709]"
         >
           {/* Crisp Widescreen Foreground Banner */}
